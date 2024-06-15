@@ -1,7 +1,7 @@
 package com.danielvishnievskyi.backendapplication.utils.authentication;
 
-import com.danielvishnievskyi.backendapplication.model.entities.RegisteredPlayer;
-import com.danielvishnievskyi.backendapplication.model.entities.Token;
+import com.danielvishnievskyi.backendapplication.model.entities.RegisteredPlayerEntity;
+import com.danielvishnievskyi.backendapplication.model.entities.TokenEntity;
 import com.danielvishnievskyi.backendapplication.model.enums.TokenType;
 import com.danielvishnievskyi.backendapplication.repositories.TokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +13,8 @@ public class AuthenticationUtilsImpl implements AuthenticationUtils {
   private final TokenRepository tokenRepository;
 
   @Override
-  public void saveToken(RegisteredPlayer registeredPlayer, String jwtToken) {
-    var token = Token.builder()
+  public void saveToken(RegisteredPlayerEntity registeredPlayer, String jwtToken) {
+    var token = TokenEntity.builder()
       .registeredPlayer(registeredPlayer)
       .token(jwtToken)
       .tokenType(TokenType.BEARER)
@@ -25,7 +25,7 @@ public class AuthenticationUtilsImpl implements AuthenticationUtils {
   }
 
   @Override
-  public void deleteAllTokens(RegisteredPlayer registeredPlayer) {
+  public void deleteAllTokens(RegisteredPlayerEntity registeredPlayer) {
     var validSoulTokens = tokenRepository.findAllValidTokenByRegisteredPlayer(registeredPlayer.getUuid());
     tokenRepository.deleteAll(validSoulTokens);
   }

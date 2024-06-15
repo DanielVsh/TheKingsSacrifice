@@ -3,8 +3,7 @@ package com.danielvishnievskyi.backendapplication.services.player;
 import com.danielvishnievskyi.backendapplication.model.dto.player.AnonymousPlayerResponseDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.player.RegisterPlayerRequestDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.player.RegisteredPlayerResponseDTO;
-import com.danielvishnievskyi.backendapplication.model.entities.AnonymousPlayer;
-import com.danielvishnievskyi.backendapplication.model.mappers.player.PlayerMapper;
+import com.danielvishnievskyi.backendapplication.model.entities.AnonymousPlayerEntity;
 import com.danielvishnievskyi.backendapplication.repositories.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,14 +19,12 @@ public class PlayerServiceImpl implements PlayerService {
 
   @Override
   public RegisteredPlayerResponseDTO createPlayer(RegisterPlayerRequestDTO registerPlayerRequestDto) {
-    return null;
+    throw new UnsupportedOperationException("Not yet implemented");
   }
 
   @Override
   public AnonymousPlayerResponseDTO createAnonymousPlayer() {
-    AnonymousPlayer player = playerRepository.save(
-      new AnonymousPlayer(null)
-    );
+    AnonymousPlayerEntity player = playerRepository.save(new AnonymousPlayerEntity());
 
     return new AnonymousPlayerResponseDTO(player.getUuid());
   }

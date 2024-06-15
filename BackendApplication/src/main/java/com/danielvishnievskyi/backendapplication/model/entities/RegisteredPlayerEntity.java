@@ -20,15 +20,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @DiscriminatorValue("registered")
-public class RegisteredPlayer extends Player implements UserDetails {
-  public RegisteredPlayer(UUID uuid, String nickname, String email, String password, int rating, List<Role> roles) {
-    super(uuid);
-    this.email = email;
-    this.password = password;
-    this.nickname = nickname;
-    this.rating = rating;
-    this.roles = roles;
-  }
+public class RegisteredPlayerEntity extends PlayerEntity implements UserDetails {
+
+  @Column(unique = true, nullable = false)
+  private String nickname;
 
   @Column(unique = true, nullable = false)
   private String email;
@@ -36,9 +31,6 @@ public class RegisteredPlayer extends Player implements UserDetails {
   @JsonIgnore
   @Column(nullable = false)
   private String password;
-
-  @Column(unique = true, nullable = false)
-  private String nickname;
 
   private int rating;
 

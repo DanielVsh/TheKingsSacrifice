@@ -1,7 +1,8 @@
 package com.danielvishnievskyi.backendapplication.model.dto.game;
 
+import com.danielvishnievskyi.backendapplication.model.TimeFormat;
 import com.danielvishnievskyi.backendapplication.model.dto.player.PlayerResponseDTO;
-import com.danielvishnievskyi.backendapplication.model.entities.Player;
+import com.danielvishnievskyi.backendapplication.model.entities.PlayerEntity;
 import com.danielvishnievskyi.backendapplication.model.enums.GameState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +20,8 @@ public class GameResponseDTO {
   private PlayerResponseDTO whitePlayer;
   private PlayerResponseDTO blackPlayer;
   private List<String> history;
-  private Player winner;
+  private PlayerEntity winner;
   private GameState gameResult;
   private LocalDateTime date;
+  private TimeFormat timeFormat;
 }

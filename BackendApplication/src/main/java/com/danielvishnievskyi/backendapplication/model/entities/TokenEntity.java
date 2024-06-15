@@ -11,7 +11,7 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Token {
+public class TokenEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false)
@@ -29,7 +29,7 @@ public class Token {
   private boolean expired;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "registeredPlayer")
+  @JoinColumn(name = "registered_player")
   @ToString.Exclude
-  private RegisteredPlayer registeredPlayer;
+  private RegisteredPlayerEntity registeredPlayer;
 }

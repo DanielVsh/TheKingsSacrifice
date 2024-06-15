@@ -3,8 +3,6 @@ package com.danielvishnievskyi.backendapplication.model.entities;
 import com.danielvishnievskyi.backendapplication.model.enums.GameState;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,7 +15,7 @@ import java.util.UUID;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Game {
+public class GameEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   @Column(name = "uuid", nullable = false)
@@ -25,22 +23,32 @@ public class Game {
 
   @ManyToOne
   @JoinColumn(name = "white_player_id")
-  private Player whitePlayer;
+  private PlayerEntity whitePlayer;
 
   @ManyToOne
   @JoinColumn(name = "black_player_id")
-  private Player blackPlayer;
+  private PlayerEntity blackPlayer;
 
   @ManyToOne
   @JoinColumn(name = "winner_player_id")
-  private Player winner;
+  private PlayerEntity winner;
 
-  @Column(name = "gameResult")
+  @Enumerated(EnumType.STRING)
+  @Column(name = "game_result")
   private GameState gameResult;
+
+  /** Time format i.e 5+3 => 5 minutes + 3 seconds per move ('unlimited' if no time is specified) */
+  @Column(name = "time_format", nullable = false)
+  private String timeFormat;
 
   @Column(name = "date")
   private LocalDateTime date;
 
   @ElementCollection(fetch = FetchType.EAGER)
   private List<String> history;
+
+  @PrePersist
+  public void prePersist() {
+    this.date = LocalDateTime.now();
+  }
 }

@@ -1,9 +1,9 @@
 package com.danielvishnievskyi.backendapplication.utils.authentication;
 
-import com.danielvishnievskyi.backendapplication.model.entities.RegisteredPlayer;
+import com.danielvishnievskyi.backendapplication.model.entities.RegisteredPlayerEntity;
 
 public interface AuthenticationUtils {
-  void saveToken(RegisteredPlayer registeredPlayer, String jwtToken);
+  void saveToken(RegisteredPlayerEntity registeredPlayer, String jwtToken);
 
-  void deleteAllTokens(RegisteredPlayer registeredPlayer);
+  void deleteAllTokens(RegisteredPlayerEntity registeredPlayer);
 }

@@ -12,8 +12,5 @@ import java.util.UUID;
 @ToString
 @AllArgsConstructor
 @DiscriminatorValue("anonymous")
-public class AnonymousPlayer extends Player{
-  public AnonymousPlayer(UUID uuid) {
-    super(uuid);
-  }
+public class AnonymousPlayerEntity extends PlayerEntity {
 }

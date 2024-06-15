@@ -13,6 +13,4 @@ public class AnonymousPlayerResponseDTO extends PlayerResponseDTO {
   public AnonymousPlayerResponseDTO(UUID uuid) {
     super(uuid);
   }
-
-
 }

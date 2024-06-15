@@ -4,21 +4,24 @@ import com.danielvishnievskyi.backendapplication.model.dto.game.GameCreateReques
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameStartRequestDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameResponseDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameSaveRequestDTO;
-import com.danielvishnievskyi.backendapplication.model.entities.Game;
-import com.danielvishnievskyi.backendapplication.model.entities.Player;
+import com.danielvishnievskyi.backendapplication.model.entities.GameEntity;
+import com.danielvishnievskyi.backendapplication.model.entities.PlayerEntity;
 import com.danielvishnievskyi.backendapplication.model.enums.GameState;
-import com.danielvishnievskyi.backendapplication.model.mappers.game.GameMapper;
+import com.danielvishnievskyi.backendapplication.model.mappers.GameMapper;
 import com.danielvishnievskyi.backendapplication.repositories.GameRepository;
 import com.danielvishnievskyi.backendapplication.repositories.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class GameServiceImpl implements GameService {
   private final GameRepository gameRepository;
@@ -27,21 +30,21 @@ public class GameServiceImpl implements GameService {
 
   @Override
   public GameResponseDTO getGame(UUID uuid) {
-    return gameMapper.gameToResponseDTO(gameRepository.findById(uuid).orElseThrow());
+    return gameMapper.mapToResponseDTO(gameRepository.findById(uuid).orElseThrow());
   }
 
   @Override
   public GameResponseDTO saveGame(GameSaveRequestDTO gameSaveRequestDTO) {
-    Game game = gameRepository.findById(gameSaveRequestDTO.getUuid()).orElseThrow();
-    game.setWinner(gameSaveRequestDTO.getWinner());
-    game.setGameResult(gameSaveRequestDTO.getGameResult());
-    return gameMapper.gameToResponseDTO(game);
+    GameEntity gameEntity = gameRepository.findById(gameSaveRequestDTO.getUuid()).orElseThrow();
+    gameEntity.setWinner(gameSaveRequestDTO.getWinner());
+    gameEntity.setGameResult(gameSaveRequestDTO.getGameResult());
+    return gameMapper.mapToResponseDTO(gameEntity);
   }
 
   @Override
   public GameResponseDTO createGame(GameCreateRequestDTO gameCreateRequestDTO) {
-    Optional<Player> whitePlayer = Optional.empty();
-    Optional<Player> blackPlayer = Optional.empty();
+    Optional<PlayerEntity> whitePlayer = Optional.empty();
+    Optional<PlayerEntity> blackPlayer = Optional.empty();
     if (gameCreateRequestDTO.getWhitePlayer() != null) { //TODO: custom exception
       whitePlayer = playerRepository.findById(gameCreateRequestDTO.getWhitePlayer());
     } else if (gameCreateRequestDTO.getBlackPlayer() != null) {
@@ -51,25 +54,32 @@ public class GameServiceImpl implements GameService {
       throw new RuntimeException("Game can't be created without players");
     }
 
-    Game game = Game.builder()
+    List<GameEntity> alreadyCreatedGamesByPlayer = null;
+    if (whitePlayer.isPresent()) {
+      alreadyCreatedGamesByPlayer = gameRepository.getGameEntitiesByPlayer(whitePlayer.get(), GameState.CREATED);
+    } else {
+      alreadyCreatedGamesByPlayer = gameRepository.getGameEntitiesByPlayer(blackPlayer.get(), GameState.CREATED);
+    }
+    if (!CollectionUtils.isEmpty(alreadyCreatedGamesByPlayer)) {
+      throw new RuntimeException("Players already have created game");
+    }
+
+    GameEntity gameEntity = GameEntity.builder()
       .whitePlayer(whitePlayer.orElse(null))
       .blackPlayer(blackPlayer.orElse(null))
       .gameResult(GameState.CREATED)
-      .date(LocalDateTime.now())
+      .timeFormat(gameCreateRequestDTO.getTimeFormat())
       .build();
-    return gameMapper.gameToResponseDTO(gameRepository.save(game));
+    return gameMapper.mapToResponseDTO(gameRepository.save(gameEntity));
   }
 
-  @Transactional
   @Override
   public GameResponseDTO startGame(GameStartRequestDTO gameStartRequestDTO) {
-    Game game = gameRepository.findById(gameStartRequestDTO.getUuid()).orElseThrow();
-    game.setWhitePlayer(playerRepository.findById(gameStartRequestDTO.getWhitePlayer()).orElseThrow());
-    game.setBlackPlayer(playerRepository.findById(gameStartRequestDTO.getBlackPlayer()).orElseThrow());
-    game.setDate(LocalDateTime.now());
-    game.setGameResult(GameState.ONGOING);
+    GameEntity gameEntity = gameRepository.findById(gameStartRequestDTO.getUuid()).orElseThrow();
+    gameEntity.setWhitePlayer(playerRepository.findById(gameStartRequestDTO.getWhitePlayer()).orElseThrow());
+    gameEntity.setBlackPlayer(playerRepository.findById(gameStartRequestDTO.getBlackPlayer()).orElseThrow());
+    gameEntity.setGameResult(GameState.ONGOING);
 
-    return gameMapper.gameToResponseDTO(gameRepository.save(game));
+    return gameMapper.mapToResponseDTO(gameRepository.save(gameEntity));
   }
-
 }

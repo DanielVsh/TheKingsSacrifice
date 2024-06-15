@@ -33,9 +33,9 @@ public class SecurityConfiguration {
       .csrf(AbstractHttpConfigurer::disable)
       .cors(Customizer.withDefaults())
       .authorizeHttpRequests(authManager -> authManager
-        .requestMatchers("/api/v1/auth/**").permitAll()
-        .requestMatchers("/api/v1/player/anonymous/**").permitAll()
-        .requestMatchers("/api/v1/game/**").permitAll()
+        .requestMatchers("/rest/auth/**").permitAll()
+        .requestMatchers("/rest/player/anonymous/**").permitAll()
+        .requestMatchers("/rest/game/**").permitAll()
         .requestMatchers("/ws/**").permitAll()
         .anyRequest().authenticated()
       ).sessionManagement(
@@ -45,7 +45,7 @@ public class SecurityConfiguration {
       .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
       .logout(httpSecurityLogoutConfigurer ->
         httpSecurityLogoutConfigurer
-          .logoutUrl("/api/v1/auth/logout")
+          .logoutUrl("/rest/auth/logout")
           .addLogoutHandler(logoutHandler)
           .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
       );

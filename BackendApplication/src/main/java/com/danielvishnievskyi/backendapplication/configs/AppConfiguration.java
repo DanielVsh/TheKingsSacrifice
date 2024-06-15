@@ -2,7 +2,6 @@ package com.danielvishnievskyi.backendapplication.configs;
 
 import com.danielvishnievskyi.backendapplication.repositories.RegisteredPlayerRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,15 +16,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.List;
-
 @Configuration
 @RequiredArgsConstructor
 public class AppConfiguration {
   private final RegisteredPlayerRepository registeredPlayerRepository;
-
-  @Value("${application.config.client}")
-  private String client;
+  private final ApplicationPropertiesConfig applicationPropertiesConfig;
 
   @Bean
   public UserDetailsService userDetailsService() {
@@ -38,9 +33,7 @@ public class AppConfiguration {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowCredentials(true);
-    config.setAllowedOriginPatterns(List.of(
-      client
-    ));
+    config.setAllowedOriginPatterns(applicationPropertiesConfig.getClients());
     config.addAllowedHeader("*");
     config.addAllowedMethod("*");
     config.setMaxAge(60L * 60L * 2L);

@@ -11,12 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/player")
+@RequestMapping("/rest/player")
 @RequiredArgsConstructor
 public class PlayerController {
 
   private final PlayerService playerService;
-
 
   @PostMapping("/anonymous")
   public ResponseEntity<AnonymousPlayerResponseDTO> createAnonymousPlayer() {

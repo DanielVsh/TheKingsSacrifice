@@ -1,5 +1,7 @@
 package com.danielvishnievskyi.backendapplication.model.dto.game;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
@@ -12,4 +14,7 @@ import java.util.UUID;
 public class GameCreateRequestDTO {
   private UUID whitePlayer;
   private UUID blackPlayer;
+  @NotBlank
+  @Pattern(regexp = "\\d+\\+\\d+|unlimited", message = "Invalid time format")
+  private String timeFormat;
 }
