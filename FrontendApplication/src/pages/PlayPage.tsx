@@ -17,7 +17,7 @@ export const PlayPage = () => {
 
 
   useEffect(() => {
-    axios.get(`${backendIp}/api/v1/game/${gameID}`)
+    axios.get(`${backendIp}/rest/game/${gameID}`)
       .then((response) => {
         setData(response.data);
         setIsLoading(false);

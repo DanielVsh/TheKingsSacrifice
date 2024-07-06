@@ -26,7 +26,10 @@ export const WaitingRoomPage: React.FC<GameResponse> = (props) => {
       <div>
         {window.location.href}
 
-        <div onClick={handleStartGame}>Play game</div>
+        {user?.uuid !== props?.whitePlayer?.uuid && user?.uuid !== props?.blackPlayer?.uuid
+          ? <div onClick={handleStartGame}>Play game</div>
+          : <div> :) </div>
+        }
       </div>
     </>
   );

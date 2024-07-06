@@ -11,6 +11,7 @@ interface GameResponse {
 interface GameCreateRequest {
   whitePlayer: string | null
   blackPlayer: string | null
+  timeFormat: string
 }
 
 interface GameStartRequest {

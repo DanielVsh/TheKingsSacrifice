@@ -4,7 +4,7 @@ import {backendIp} from "../../config/backend.ts";
 export const playerApi = createApi({
   reducerPath: 'playerApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: `${backendIp}/api/v1/player`,
+    baseUrl: `${backendIp}/rest/player`,
   }),
   endpoints: (builder) => ({
     getPlayerData: builder.query<RegisteredPlayerResponse | AnonymousPlayerResponse, string>({

@@ -9,7 +9,7 @@ import {AuthRoute} from "./components/AuthRoute.tsx";
 function App() {
 
   return (
-    <>
+    <div className={`bg-black text-white`} style={{height: "100vh"}}>
       <Routes>
         <Route path={'/'} element={<MainPage/>}/>
         <Route element={<AuthRoute/>}>
@@ -18,7 +18,7 @@ function App() {
         </Route>
         <Route path={'*'} element={<NotFoundPage/>}/>
       </Routes>
-    </>
+    </div>
   )
 }
 

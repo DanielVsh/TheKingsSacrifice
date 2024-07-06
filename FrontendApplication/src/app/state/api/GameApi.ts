@@ -4,7 +4,7 @@ import {backendIp} from "../../config/backend.ts";
 export const gameApi = createApi({
   reducerPath: 'gameApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: `${backendIp}/api/v1/game`,
+    baseUrl: `${backendIp}/rest/game`,
   }),
   endpoints: (builder) => ({
     getGameData: builder.query<GameResponse, string>({

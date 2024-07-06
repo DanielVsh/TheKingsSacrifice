@@ -13,6 +13,7 @@ import {RootState} from "../app/state/store.ts";
 export const PlayComponent: React.FC<GameResponse> = (props) => {
   const [stompClient, setStompClient] = useState<Client | null>(null);
   const [game, setGame] = useState(new Chess());
+  const [playersTime, setPlayersTime] = useState()
 
   const [saveGame] = useSaveGameMutation();
 
@@ -34,6 +35,10 @@ export const PlayComponent: React.FC<GameResponse> = (props) => {
     const onConnect = () => {
       client.subscribe(`/topic/game/${props.uuid}`, (message) => {
         setGame(new Chess(message.body));
+      });
+      client.subscribe(`/topic/game/${props.uuid}/time`, (message) => {
+        console.log(JSON.parse(message.body))
+        setPlayersTime(JSON.parse(message.body))
       });
     };
 
@@ -65,7 +70,7 @@ export const PlayComponent: React.FC<GameResponse> = (props) => {
     });
   };
 
-  const canPlayerMove = () : boolean => {
+  const canPlayerMove = (): boolean => {
     if (player && props.whitePlayer && game.turn() === 'w' && player.uuid !== props.whitePlayer.uuid) return false;
     if (player && props.blackPlayer && game.turn() === 'b' && player.uuid !== props.blackPlayer.uuid) return false;
 
@@ -79,7 +84,6 @@ export const PlayComponent: React.FC<GameResponse> = (props) => {
     if (game.isGameOver()) {
       const gameState = determineGameState(game);
       const winner = gameState === GameState.CHECKMATE ? determineWinner(game, props) : null;
-
       saveGame({
         uuid: props.uuid,
         gameResult: gameState,
@@ -88,15 +92,27 @@ export const PlayComponent: React.FC<GameResponse> = (props) => {
     }
   };
 
+  function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  }
+
   return (
     <>
-      {player &&
-        <ChessGameBoard
-          game={game}
-          onUserMove={handleUserMove}
-          boardOrientation={getBoardOrientation()}
-          canPlayerMove={canPlayerMove()}/>
-      }
+      <div className={`flex justify-center items-center min-h-screen`}>
+        <a>Anonymous player</a>
+        {playersTime && formatTime(playersTime.whitePlayerTime)}
+        {player &&
+            <ChessGameBoard
+                game={game}
+                onUserMove={handleUserMove}
+                boardOrientation={getBoardOrientation()}
+                canPlayerMove={canPlayerMove()}/>
+        }
+        <a>Anonymous player</a>
+        {playersTime && formatTime(playersTime.blackPlayerTime)}
+      </div>
     </>
   )
 };
