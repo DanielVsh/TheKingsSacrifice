@@ -1,6 +1,7 @@
 package com.danielvishnievskyi.backendapplication.controllers.websocket;
 
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameResponseDTO;
+import com.danielvishnievskyi.backendapplication.model.dto.game.GameStartRequestDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameTimeResponseDTO;
 import com.danielvishnievskyi.backendapplication.model.entities.GameEntity;
 import com.danielvishnievskyi.backendapplication.model.entities.GameTimeEntity;
@@ -30,7 +31,6 @@ import java.util.UUID;
 @RequestMapping("/ws")
 @RequiredArgsConstructor
 public class GameWebSocketController {
-
   private final SimpMessagingTemplate messagingTemplate;
   private final GameRepository gameRepository;
   private final GameService gameService;
@@ -48,22 +48,29 @@ public class GameWebSocketController {
   }
 
   @Transactional
-  @Scheduled(fixedRate = 1000)
+  @Scheduled(fixedRate = 100)
   public void sendTimeUpdates() {
-    gameRepository.getAllUnlimitedOngoingGames().parallelStream()
+    gameRepository.getAllNotUnlimitedOngoingGames().parallelStream()
       .forEach(gameEntity -> {
-        GameTimeEntity gameTime = gameEntity.getGameTime();
-        List<String> gameFenHistory = gameEntity.getHistory();
-        if (gameFenHistory.isEmpty() || FenUtils.getActiveColor(gameFenHistory.getLast()) == Color.WHITE) {
-          if (!gameTime.updateWhitePlayerTime()) {
-            gameEntity.setWinner(gameEntity.getBlackPlayer());
-            gameEntity.setGameResult(GameState.TIMEOUT);
+        final GameTimeEntity gameTime = gameEntity.getGameTime();
+        final List<String> gameFenHistory = gameEntity.getHistory();
+
+        final boolean isWhiteFirstMove = gameFenHistory.isEmpty();
+        final boolean isBlackTurnToMove = !isWhiteFirstMove && FenUtils.getActiveColor(gameFenHistory.getLast()) == Color.BLACK;
+        final boolean isBlackFirstMove = gameEntity.getHistory().size() == 1;
+
+        if (isBlackTurnToMove) {
+          gameTime.updateBlackPlayerTime(-100);
+          if (isBlackFirstMove) {
+            setGameAbandonedIfPreparationTimeExpired(gameTime.getBlackPlayerTime(), gameEntity);
           }
+          checkAndSetTimeout(!gameTime.hasBlackPlayerTime(), gameEntity, gameEntity.getWhitePlayer());
         } else {
-          if (!gameTime.updateBlackPlayerTime()) {
-            gameEntity.setWinner(gameEntity.getWhitePlayer());
-            gameEntity.setGameResult(GameState.TIMEOUT);
+          gameTime.updateWhitePlayerTime(-100);
+          if (isWhiteFirstMove) {
+            setGameAbandonedIfPreparationTimeExpired(gameTime.getWhitePlayerTime(), gameEntity);
           }
+          checkAndSetTimeout(!gameTime.hasWhitePlayerTime(), gameEntity, gameEntity.getBlackPlayer());
         }
         messagingTemplate.convertAndSend(STR."/topic/game/\{gameEntity.getUuid()}/time",
           new GameTimeResponseDTO(gameTime.getWhitePlayerTime(), gameTime.getBlackPlayerTime())
@@ -71,20 +78,28 @@ public class GameWebSocketController {
       });
   }
 
+  private static void checkAndSetTimeout(boolean isTimeout, GameEntity gameEntity, PlayerEntity winner) {
+    if (isTimeout) {
+      gameEntity
+        .setWinner(winner)
+        .setGameResult(GameState.TIMEOUT);
+    }
+  }
+  private static void setGameAbandonedIfPreparationTimeExpired(long gameTime, GameEntity gameEntity) {
+    if (gameTime <= gameEntity.getBasicGameTime() * 1000L) {
+      gameEntity.setGameResult(GameState.ABANDONED);
+    }
+  }
+
   @MessageMapping("/game/{gameId}/start")
   public void startGame(
       @DestinationVariable String gameId,
-      @AuthenticationPrincipal PlayerEntity playerEntity
+      @Payload GameStartRequestDTO gameStartRequestDTO
       ) {
-    GameEntity gameEntity = gameRepository.findById(UUID.fromString(gameId))
-        .orElseThrow(() -> new RuntimeException("Game[%s] not found".formatted(gameId)));
+    GameResponseDTO gameResponseDTO = gameService.startGame(gameStartRequestDTO);
 
-    if (gameEntity.getWhitePlayer() == null) {
-      gameEntity.setWhitePlayer(playerEntity);
-    } else if (gameEntity.getBlackPlayer() == null) {
-      gameEntity.setBlackPlayer(playerEntity);
-    }
-    gameEntity.setGameResult(GameState.ONGOING);
-    gameRepository.save(gameEntity);
+    log.info("game[{}] started with white[{}] and black[{}] players",
+      gameResponseDTO.getUuid(), gameResponseDTO.getWhitePlayer(), gameResponseDTO.getBlackPlayer());
+    messagingTemplate.convertAndSend(STR."/topic/game/\{gameId}/started", "true");
   }
 }

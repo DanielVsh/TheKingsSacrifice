@@ -3,7 +3,6 @@ package com.danielvishnievskyi.backendapplication.model.enums;
 public enum GameState {
   CREATED,
   ONGOING,
-  CHECK,
   CHECKMATE,
   STALEMATE,
   DRAW_BY_INSUFFICIENT_MATERIAL,

@@ -10,11 +10,13 @@ import lombok.*;
 @NoArgsConstructor
 public class GameTimeEntity {
 
+  public static final int PREPARATION_TIME = 60000; // 60 sec
+
   public GameTimeEntity(GameEntity game) {
     this.game = game;
-    int gameTime = game.getBasicGameTimeInSec();
-    this.whitePlayerTime = gameTime + 60;
-    this.blackPlayerTime = gameTime + 60;
+    int gameTime = game.getBasicGameTime() * 1000;
+    this.whitePlayerTime = gameTime + PREPARATION_TIME;
+    this.blackPlayerTime = gameTime + PREPARATION_TIME;
   }
 
   @Id
@@ -26,32 +28,27 @@ public class GameTimeEntity {
   @OneToOne(fetch = FetchType.LAZY)
   GameEntity game;
 
+  /** in milliseconds */
   @Column(name = "white_player_timer", nullable = false)
-  int whitePlayerTime;
+  long whitePlayerTime;
 
+  /** in milliseconds */
   @Column(name = "black_player_timer", nullable = false)
-  int blackPlayerTime;
+  long blackPlayerTime;
 
-  public boolean updateWhitePlayerTime() {
-    whitePlayerTime -= 1;
+  public void updateWhitePlayerTime(int timeShift) {
+    whitePlayerTime += timeShift;
+  }
+
+  public void updateBlackPlayerTime(int timeShift) {
+    blackPlayerTime += timeShift;
+  }
+
+  public boolean hasWhitePlayerTime(){
     return whitePlayerTime > 0;
   }
 
-  public boolean updateBlackPlayerTime() {
-    blackPlayerTime -= 1;
+  public boolean hasBlackPlayerTime(){
     return blackPlayerTime > 0;
-  }
-
-  public void updateWhitePlayerTimeByMove() {
-    whitePlayerTime = updatePlayerTime(whitePlayerTime);
-  }
-
-  public void updateBlackPlayerTimeByMove() {
-    blackPlayerTime = updatePlayerTime(blackPlayerTime);
-  }
-
-  private int updatePlayerTime(int playerTime) {
-    playerTime += Integer.parseInt(game.getTimeFormat().split("\\+")[1]);
-    return playerTime;
   }
 }

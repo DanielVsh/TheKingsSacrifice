@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,15 +55,13 @@ public class GameServiceImpl implements GameService {
       throw new RuntimeException("Game can't be created without players");
     }
 
-    List<GameEntity> alreadyCreatedGamesByPlayer = null;
+    ArrayList<PlayerEntity> playerEntities = new ArrayList<>();
     if (whitePlayer.isPresent()) {
-      alreadyCreatedGamesByPlayer = gameRepository.getGameEntitiesByPlayer(whitePlayer.get(), GameState.CREATED);
+      playerEntities.add(whitePlayer.get());
     } else {
-      alreadyCreatedGamesByPlayer = gameRepository.getGameEntitiesByPlayer(blackPlayer.get(), GameState.CREATED);
+      playerEntities.add(blackPlayer.get());
     }
-    if (!CollectionUtils.isEmpty(alreadyCreatedGamesByPlayer)) {
-      throw new RuntimeException("Players already have created game");
-    }
+    checkIfPlayersHaveUnfinishedGames(playerEntities);
 
     GameEntity gameEntity = GameEntity.builder()
       .whitePlayer(whitePlayer.orElse(null))
@@ -78,14 +77,31 @@ public class GameServiceImpl implements GameService {
     return gameMapper.mapToResponseDTO(gameRepository.save(gameEntity));
   }
 
+  private void checkIfPlayersHaveUnfinishedGames(List<PlayerEntity> playerEntities) {
+    if (!CollectionUtils.isEmpty(gameRepository.getGamesByPlayersAndGameResult(
+      playerEntities, List.of(GameState.ONGOING, GameState.CREATED)
+    ))) {
+      throw new RuntimeException("Players already have created game");
+    }
+  }
+
   @Override
   public GameResponseDTO startGame(GameStartRequestDTO gameStartRequestDTO) {
     GameEntity gameEntity = gameRepository.findById(gameStartRequestDTO.getUuid()).orElseThrow();
-    gameEntity.setWhitePlayer(playerRepository.findById(gameStartRequestDTO.getWhitePlayer()).orElseThrow());
-    gameEntity.setBlackPlayer(playerRepository.findById(gameStartRequestDTO.getBlackPlayer()).orElseThrow());
+    PlayerEntity whitePlayer = playerRepository.findById(gameStartRequestDTO.getWhitePlayer()).orElseThrow();
+    PlayerEntity blackPlayer = playerRepository.findById(gameStartRequestDTO.getBlackPlayer()).orElseThrow();
+
+    if (gameEntity.getWhitePlayer() == null) {
+      checkIfPlayersHaveUnfinishedGames(List.of(whitePlayer));
+    } else if (gameEntity.getBlackPlayer() == null) {
+      checkIfPlayersHaveUnfinishedGames(List.of(blackPlayer));
+    }
+
+    gameEntity.setWhitePlayer(whitePlayer);
+    gameEntity.setBlackPlayer(blackPlayer);
     gameEntity.setGameResult(GameState.ONGOING);
 
-    return gameMapper.mapToResponseDTO(gameRepository.save(gameEntity));
+    return gameMapper.mapToResponseDTO(gameEntity);
   }
 
   @Override
@@ -99,17 +115,18 @@ public class GameServiceImpl implements GameService {
     if (gameTime != null) {
       if (FenUtils.getActiveColor(fen) == Color.WHITE) {
         if (gameEntity.getHistory().size() == 2) {
-          gameTime.setBlackPlayerTime(gameEntity.getBasicGameTimeInSec());
+          gameTime.setBlackPlayerTime(gameEntity.getBasicGameTime() * 1000L);
         }
-        gameTime.updateBlackPlayerTimeByMove();
+        gameTime.updateBlackPlayerTime(gameEntity.getIncreaseTimePerMove() * 1000);
       } else {
         if (gameEntity.getHistory().size() == 1) {
-          gameTime.setWhitePlayerTime(gameEntity.getBasicGameTimeInSec());
+          gameTime.setWhitePlayerTime(gameEntity.getBasicGameTime() * 1000L);
         }
-        gameTime.updateWhitePlayerTimeByMove();
+        gameTime.updateWhitePlayerTime(gameEntity.getIncreaseTimePerMove() * 1000);
       }
     }
 
-    return gameMapper.mapToResponseDTO(gameRepository.save(gameEntity));
+    return gameMapper.mapToResponseDTO(gameEntity);
   }
+
 }
