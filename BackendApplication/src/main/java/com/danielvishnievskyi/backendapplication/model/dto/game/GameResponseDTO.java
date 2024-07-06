@@ -24,4 +24,5 @@ public class GameResponseDTO {
   private GameState gameResult;
   private LocalDateTime date;
   private TimeFormat timeFormat;
+  private GameTimeResponseDTO playersTime;
 }

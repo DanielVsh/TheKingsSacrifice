@@ -1,21 +1,21 @@
 package com.danielvishnievskyi.backendapplication.services.game;
 
-import com.danielvishnievskyi.backendapplication.model.dto.game.GameCreateRequestDTO;
-import com.danielvishnievskyi.backendapplication.model.dto.game.GameStartRequestDTO;
-import com.danielvishnievskyi.backendapplication.model.dto.game.GameResponseDTO;
-import com.danielvishnievskyi.backendapplication.model.dto.game.GameSaveRequestDTO;
+import com.danielvishnievskyi.backendapplication.model.TimeFormat;
+import com.danielvishnievskyi.backendapplication.model.dto.game.*;
 import com.danielvishnievskyi.backendapplication.model.entities.GameEntity;
+import com.danielvishnievskyi.backendapplication.model.entities.GameTimeEntity;
 import com.danielvishnievskyi.backendapplication.model.entities.PlayerEntity;
+import com.danielvishnievskyi.backendapplication.model.enums.Color;
 import com.danielvishnievskyi.backendapplication.model.enums.GameState;
 import com.danielvishnievskyi.backendapplication.model.mappers.GameMapper;
 import com.danielvishnievskyi.backendapplication.repositories.GameRepository;
 import com.danielvishnievskyi.backendapplication.repositories.PlayerRepository;
+import com.danielvishnievskyi.backendapplication.utils.FenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -70,6 +70,11 @@ public class GameServiceImpl implements GameService {
       .gameResult(GameState.CREATED)
       .timeFormat(gameCreateRequestDTO.getTimeFormat())
       .build();
+
+    if (!gameCreateRequestDTO.getTimeFormat().equals(TimeFormat.UNLIMITED_TIME_FORMAT)) {
+      gameEntity.setGameTime(new GameTimeEntity(gameEntity));
+    }
+
     return gameMapper.mapToResponseDTO(gameRepository.save(gameEntity));
   }
 
@@ -79,6 +84,31 @@ public class GameServiceImpl implements GameService {
     gameEntity.setWhitePlayer(playerRepository.findById(gameStartRequestDTO.getWhitePlayer()).orElseThrow());
     gameEntity.setBlackPlayer(playerRepository.findById(gameStartRequestDTO.getBlackPlayer()).orElseThrow());
     gameEntity.setGameResult(GameState.ONGOING);
+
+    return gameMapper.mapToResponseDTO(gameRepository.save(gameEntity));
+  }
+
+  @Override
+  public GameResponseDTO updateGameMove(String gameId, String fen) {
+    GameEntity gameEntity = gameRepository.findById(UUID.fromString(gameId))
+      .orElseThrow(() -> new RuntimeException("Game[%s] not found".formatted(gameId)));
+
+    gameEntity.getHistory().add(fen);
+
+    GameTimeEntity gameTime = gameEntity.getGameTime();
+    if (gameTime != null) {
+      if (FenUtils.getActiveColor(fen) == Color.WHITE) {
+        if (gameEntity.getHistory().size() == 2) {
+          gameTime.setBlackPlayerTime(gameEntity.getBasicGameTimeInSec());
+        }
+        gameTime.updateBlackPlayerTimeByMove();
+      } else {
+        if (gameEntity.getHistory().size() == 1) {
+          gameTime.setWhitePlayerTime(gameEntity.getBasicGameTimeInSec());
+        }
+        gameTime.updateWhitePlayerTimeByMove();
+      }
+    }
 
     return gameMapper.mapToResponseDTO(gameRepository.save(gameEntity));
   }

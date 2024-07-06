@@ -37,9 +37,12 @@ public class GameEntity {
   @Column(name = "game_result")
   private GameState gameResult;
 
-  /** Time format i.e 5+3 => 5 minutes + 3 seconds per move ('unlimited' if no time is specified) */
+  /** Time format i.e int+int => time in sec + time in sec per move ('unlimited' if no time is specified) */
   @Column(name = "time_format", nullable = false)
   private String timeFormat;
+
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  private GameTimeEntity gameTime;
 
   @Column(name = "date")
   private LocalDateTime date;
@@ -47,8 +50,14 @@ public class GameEntity {
   @ElementCollection(fetch = FetchType.EAGER)
   private List<String> history;
 
+  private String pgn;
+
   @PrePersist
   public void prePersist() {
     this.date = LocalDateTime.now();
+  }
+
+  public int getBasicGameTimeInSec() {
+    return Integer.parseInt(getTimeFormat().split("\\+")[0]);
   }
 }

@@ -20,4 +20,10 @@ public interface GameRepository extends JpaRepository<GameEntity, UUID>, JpaSpec
       and g.gameResult = :gameState
     """)
   List<GameEntity> getGameEntitiesByPlayer(PlayerEntity player, GameState gameState);
+
+  @Query(value = """
+    select g from GameEntity g
+    where g.gameResult = 'ONGOING' and g.timeFormat != 'unlimited'
+  """)
+  List<GameEntity> getAllUnlimitedOngoingGames();
 }

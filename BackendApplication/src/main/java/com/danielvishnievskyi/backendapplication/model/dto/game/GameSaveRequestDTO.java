@@ -15,4 +15,5 @@ public class GameSaveRequestDTO {
   private UUID uuid;
   private PlayerEntity winner;
   private GameState gameResult;
+  private String pgn;
 }
