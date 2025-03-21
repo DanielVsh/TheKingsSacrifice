@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface RegisteredPlayerRepository extends JpaRepository<RegisteredPlayerEntity, UUID> {
   Optional<RegisteredPlayerEntity> findByEmail(String email);
+  Optional<RegisteredPlayerEntity> findByNickname(String nickname);
 }

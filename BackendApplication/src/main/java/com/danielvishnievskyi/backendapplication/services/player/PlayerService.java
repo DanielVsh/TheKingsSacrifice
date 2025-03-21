@@ -10,7 +10,6 @@ import java.util.UUID;
 
 public interface PlayerService {
   RegisteredPlayerResponseDTO createPlayer(RegisterPlayerRequestDTO registerPlayerRequestDto);
-  AnonymousPlayerResponseDTO createAnonymousPlayer();
   void removePlayer(UUID uuid);
   void removePlayers(List<UUID> uuidList);
 }

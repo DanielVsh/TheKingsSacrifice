@@ -42,7 +42,7 @@ public class GameWebSocketController {
     ) {
     GameResponseDTO gameResponseDTO = gameService.updateGameMove(gameId, fen);
 
-    messagingTemplate.convertAndSend(STR."/topic/game/\{gameId}",
+    messagingTemplate.convertAndSend("/topic/game/" + gameId,
       gameResponseDTO.getHistory().getLast()
     );
   }
@@ -72,7 +72,7 @@ public class GameWebSocketController {
           }
           checkAndSetTimeout(!gameTime.hasWhitePlayerTime(), gameEntity, gameEntity.getBlackPlayer());
         }
-        messagingTemplate.convertAndSend(STR."/topic/game/\{gameEntity.getUuid()}/time",
+        messagingTemplate.convertAndSend("/topic/game/" + gameEntity.getUuid() + "/time",
           new GameTimeResponseDTO(gameTime.getWhitePlayerTime(), gameTime.getBlackPlayerTime())
         );
       });
@@ -100,6 +100,6 @@ public class GameWebSocketController {
 
     log.info("game[{}] started with white[{}] and black[{}] players",
       gameResponseDTO.getUuid(), gameResponseDTO.getWhitePlayer(), gameResponseDTO.getBlackPlayer());
-    messagingTemplate.convertAndSend(STR."/topic/game/\{gameId}/started", "true");
+    messagingTemplate.convertAndSend("/topic/game/" + gameId + "/started", "true");
   }
 }

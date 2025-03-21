@@ -23,13 +23,6 @@ public class PlayerServiceImpl implements PlayerService {
   }
 
   @Override
-  public AnonymousPlayerResponseDTO createAnonymousPlayer() {
-    AnonymousPlayerEntity player = playerRepository.save(new AnonymousPlayerEntity());
-
-    return new AnonymousPlayerResponseDTO(player.getUuid());
-  }
-
-  @Override
   public void removePlayer(UUID uuid) {
     playerRepository.deleteById(uuid);
   }

@@ -3,7 +3,9 @@ package com.danielvishnievskyi.backendapplication.services.authentication;
 import com.danielvishnievskyi.backendapplication.model.dto.authentication.AuthenticationRequestDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.authentication.AuthenticationResponseDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.authentication.RegisterRequestDTO;
+import com.danielvishnievskyi.backendapplication.model.entities.AnonymousPlayerEntity;
 import com.danielvishnievskyi.backendapplication.model.entities.RegisteredPlayerEntity;
+import com.danielvishnievskyi.backendapplication.repositories.PlayerRepository;
 import com.danielvishnievskyi.backendapplication.repositories.RegisteredPlayerRepository;
 import com.danielvishnievskyi.backendapplication.utils.JwtUtils;
 import com.danielvishnievskyi.backendapplication.utils.authentication.AuthenticationUtils;
@@ -19,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 import static com.danielvishnievskyi.backendapplication.model.enums.Role.PLAYER;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -27,8 +29,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
-
-  private final RegisteredPlayerRepository registeredPlayerRepository;
+  private final RegisteredPlayerRepository playerRepo;
   private final JwtUtils jwtUtils;
   private final AuthenticationManager authenticationManager;
   private final AuthenticationUtils authenticationUtils;
@@ -37,10 +38,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Override
   @Transactional
   public AuthenticationResponseDTO register(RegisterRequestDTO requestDto) {
-    registeredPlayerRepository.findByEmail(requestDto.getEmail())
-      .ifPresent(registeredPlayer -> {
-        throw new RuntimeException("User with provided username already exists: %s"
+    playerRepo.findByEmail(requestDto.getEmail())
+      .ifPresent(_ -> {
+        throw new RuntimeException("User with provided email address already exists: %s"
           .formatted(requestDto.getEmail()));
+      });
+    playerRepo.findByNickname(requestDto.getNickname())
+      .ifPresent(_ -> {
+        throw new RuntimeException("User with provided nickname already exists: %s"
+          .formatted(requestDto.getNickname()));
       });
 
     RegisteredPlayerEntity registeredPlayer = new RegisteredPlayerEntity(
@@ -50,8 +56,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       requestDto.getRating(),
       List.of(PLAYER)
     );
-    RegisteredPlayerEntity saved = registeredPlayerRepository.save(registeredPlayer);
-    String jwtToken = jwtUtils.generateToken(saved);
+    RegisteredPlayerEntity saved = playerRepo.save(registeredPlayer);
+    String jwtToken = jwtUtils.generateToken(Map.of("id", saved.getUuid().toString()) ,saved);
     String refreshToken = jwtUtils.generateRefreshToken(saved);
     authenticationUtils.saveToken(saved, jwtToken);
     return new AuthenticationResponseDTO(jwtToken, refreshToken);
@@ -63,8 +69,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     authenticationManager.authenticate(
       new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword())
     );
-    RegisteredPlayerEntity registeredPlayer = registeredPlayerRepository.findByEmail(requestDto.getEmail()).orElseThrow();//TODO: custom exception
-    String jwtToken = jwtUtils.generateToken(registeredPlayer);
+    RegisteredPlayerEntity registeredPlayer = playerRepo.findByEmail(requestDto.getEmail()).orElseThrow();//TODO: custom exception
+    String jwtToken = jwtUtils.generateToken(Map.of("id", registeredPlayer.getUuid().toString()), registeredPlayer);
     String refreshToken = jwtUtils.generateRefreshToken(registeredPlayer);
     authenticationUtils.deleteAllTokens(registeredPlayer);
     authenticationUtils.saveToken(registeredPlayer, jwtToken);
@@ -83,9 +89,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     refreshToken = authHeader.substring(7);
     username = jwtUtils.extractUsername(refreshToken);
     if (username != null) {
-      RegisteredPlayerEntity registeredPlayer = registeredPlayerRepository.findByEmail(username).orElseThrow(); //TODO: custom exception
+      RegisteredPlayerEntity registeredPlayer = playerRepo.findByEmail(username).orElseThrow(); //TODO: custom exception
       if (jwtUtils.isTokenValid(refreshToken, registeredPlayer)) {
-        String accessToken = jwtUtils.generateToken(registeredPlayer);
+        String accessToken = jwtUtils.generateToken(Map.of("id", registeredPlayer.getUuid().toString()), registeredPlayer);
         authenticationUtils.deleteAllTokens(registeredPlayer);
         authenticationUtils.saveToken(registeredPlayer, accessToken);
         var authResponse = new AuthenticationResponseDTO(accessToken, refreshToken);

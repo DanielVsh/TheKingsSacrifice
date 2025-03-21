@@ -12,7 +12,7 @@ import java.util.UUID;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @DiscriminatorColumn(name = "player_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class PlayerEntity {
   @Id
