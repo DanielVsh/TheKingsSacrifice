@@ -5,11 +5,12 @@ import com.danielvishnievskyi.backendapplication.model.dto.game.*;
 import com.danielvishnievskyi.backendapplication.model.entities.GameEntity;
 import com.danielvishnievskyi.backendapplication.model.entities.GameTimeEntity;
 import com.danielvishnievskyi.backendapplication.model.entities.PlayerEntity;
+import com.danielvishnievskyi.backendapplication.model.entities.RegisteredPlayerEntity;
 import com.danielvishnievskyi.backendapplication.model.enums.Color;
 import com.danielvishnievskyi.backendapplication.model.enums.GameState;
 import com.danielvishnievskyi.backendapplication.model.mappers.GameMapper;
 import com.danielvishnievskyi.backendapplication.repositories.GameRepository;
-import com.danielvishnievskyi.backendapplication.repositories.PlayerRepository;
+import com.danielvishnievskyi.backendapplication.repositories.RegisteredPlayerRepository;
 import com.danielvishnievskyi.backendapplication.utils.FenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GameServiceImpl implements GameService {
   private final GameRepository gameRepository;
-  private final PlayerRepository playerRepository;
+  private final RegisteredPlayerRepository playerRepository;
   private final GameMapper gameMapper;
 
   @Override
@@ -44,8 +45,8 @@ public class GameServiceImpl implements GameService {
 
   @Override
   public GameResponseDTO createGame(GameCreateRequestDTO gameCreateRequestDTO) {
-    Optional<PlayerEntity> whitePlayer = Optional.empty();
-    Optional<PlayerEntity> blackPlayer = Optional.empty();
+    Optional<RegisteredPlayerEntity> whitePlayer = Optional.empty();
+    Optional<RegisteredPlayerEntity> blackPlayer = Optional.empty();
     if (gameCreateRequestDTO.getWhitePlayer() != null) { //TODO: custom exception
       whitePlayer = playerRepository.findById(gameCreateRequestDTO.getWhitePlayer());
     } else if (gameCreateRequestDTO.getBlackPlayer() != null) {
