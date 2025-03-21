@@ -130,7 +130,7 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
       newSquares[move.to] = {
         background:
           props.game.get(move.to) &&
-          props.game.get(move.to).color !== props.game.get(square).color
+          props.game.get(move.to)?.color !== props.game.get(square)?.color
             ? "radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)"
             : "radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)",
         borderRadius: "50%",
@@ -186,6 +186,12 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
                     }}
                     promotionToSquare={moveTo}
                     showPromotionDialog={showPromotionDialog}
+                    customDarkSquareStyle={{
+                      backgroundColor: "#757575"
+                    }}
+                    customLightSquareStyle={{
+                      backgroundColor: "#FCFCFC"
+                    }}
         />
       </div>
     </>

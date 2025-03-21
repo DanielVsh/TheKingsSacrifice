@@ -31,13 +31,13 @@ export const PlayComponent: React.FC<GameResponse> = (props) => {
   function webSocketConnection() {
     const sock = new SockJS(`${backendIp}/ws`);
     const client = Stomp.over(sock);
+    client.debug = () => {};
     setStompClient(client)
     const onConnect = () => {
       client.subscribe(`/topic/game/${props.uuid}`, (message) => {
         setGame(new Chess(message.body));
       });
       client.subscribe(`/topic/game/${props.uuid}/time`, (message) => {
-        console.log(JSON.parse(message.body))
         setPlayersTime(JSON.parse(message.body))
       });
     };
@@ -92,10 +92,16 @@ export const PlayComponent: React.FC<GameResponse> = (props) => {
     }
   };
 
-  function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  function formatTime(milliseconds: number): string {
+    const minutes: number = Math.floor(milliseconds / 60000);
+    const remainingMilliseconds: number = milliseconds % 60000;
+    const seconds: number = Math.floor(remainingMilliseconds / 1000);
+    const tenths: number = Math.floor((remainingMilliseconds % 1000) / 100);
+
+    const formattedSeconds: string = seconds < 10 ? `0${seconds}` : `${seconds}`;
+    const formattedTenths: string = minutes === 0 && seconds < 10 ? `.${tenths}` : '';
+
+    return `${minutes}:${formattedSeconds}${formattedTenths}`;
   }
 
   return (

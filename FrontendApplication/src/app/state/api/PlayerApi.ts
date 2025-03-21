@@ -4,19 +4,13 @@ import {backendIp} from "../../config/backend.ts";
 export const playerApi = createApi({
   reducerPath: 'playerApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: `${backendIp}/rest/player`,
+    baseUrl: `${backendIp}/rest/auth`,
   }),
   endpoints: (builder) => ({
-    getPlayerData: builder.query<RegisteredPlayerResponse | AnonymousPlayerResponse, string>({
+    getPlayerData: builder.query<RegisteredPlayerResponse , string>({
       query: (playerID) => `/${playerID}`,
     }),
-    createAnonymousPlayer: builder.mutation<AnonymousPlayerResponse, undefined>({
-      query: () => ({
-        url: `/anonymous`,
-        method: "POST",
-      }),
-    }),
-    createRegisteredPlayer: builder.mutation<RegisteredPlayerResponse, CreatePlayerRequest>({
+    createRegisteredPlayer: builder.mutation<PlayerTokens, CreatePlayerRequest>({
       query: (arg) => ({
         url: `/register`,
         method: "POST",
@@ -28,6 +22,5 @@ export const playerApi = createApi({
 
 export const {
   useGetPlayerDataQuery,
-  useCreateAnonymousPlayerMutation,
   useCreateRegisteredPlayerMutation,
 } = playerApi

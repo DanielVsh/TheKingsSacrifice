@@ -1,6 +1,3 @@
-interface AnonymousPlayerResponse {
-  uuid: string;
-}
 
 interface RegisteredPlayerResponse {
   uuid: string;
@@ -10,8 +7,14 @@ interface RegisteredPlayerResponse {
   roles: Role[]
 }
 
+interface PlayerTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
 interface CreatePlayerRequest {
-  nickname: string;
   email: string;
+  nickname: string;
+  password: string;
   rating: number;
 }
