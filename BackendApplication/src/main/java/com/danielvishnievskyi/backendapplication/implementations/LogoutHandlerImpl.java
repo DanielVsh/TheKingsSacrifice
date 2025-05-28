@@ -27,7 +27,8 @@ public class LogoutHandlerImpl implements LogoutHandler {
     }
     jwt = authHeader.substring(7);
     tokenRepository.findByToken(jwt).ifPresent(token -> {
-      tokenRepository.delete(token);
+      token.setRevoked(true);
+      tokenRepository.save(token);
       SecurityContextHolder.clearContext();
     });
   }

@@ -1,8 +1,8 @@
 package com.danielvishnievskyi.backendapplication.model.dto.game;
 
 import com.danielvishnievskyi.backendapplication.model.TimeFormat;
-import com.danielvishnievskyi.backendapplication.model.dto.player.PlayerResponseDTO;
-import com.danielvishnievskyi.backendapplication.model.entities.PlayerEntity;
+import com.danielvishnievskyi.backendapplication.model.dto.player.RegisteredPlayerResponseDTO;
+import com.danielvishnievskyi.backendapplication.model.entities.RegisteredPlayerEntity;
 import com.danielvishnievskyi.backendapplication.model.enums.GameState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,10 +17,10 @@ import java.util.UUID;
 @AllArgsConstructor
 public class GameResponseDTO {
   private UUID uuid;
-  private PlayerResponseDTO whitePlayer;
-  private PlayerResponseDTO blackPlayer;
+  private RegisteredPlayerResponseDTO whitePlayer;
+  private RegisteredPlayerEntity blackPlayer;
   private List<String> history;
-  private PlayerEntity winner;
+  private RegisteredPlayerResponseDTO winner;
   private GameState gameResult;
   private LocalDateTime date;
   private TimeFormat timeFormat;

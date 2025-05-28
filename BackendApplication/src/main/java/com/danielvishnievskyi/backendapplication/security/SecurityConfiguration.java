@@ -1,6 +1,5 @@
-package com.danielvishnievskyi.backendapplication.configs;
+package com.danielvishnievskyi.backendapplication.security;
 
-import com.danielvishnievskyi.backendapplication.implementations.JwtAuthenticationFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +46,8 @@ public class SecurityConfiguration {
         httpSecurityLogoutConfigurer
           .logoutUrl("/rest/auth/logout")
           .addLogoutHandler(logoutHandler)
-          .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+          .logoutSuccessHandler((request, response, authentication) ->
+            SecurityContextHolder.clearContext())
       );
 
     return http.build();

@@ -25,15 +25,15 @@ public class GameEntity {
 
   @ManyToOne
   @JoinColumn(name = "white_player_id")
-  private PlayerEntity whitePlayer;
+  private RegisteredPlayerEntity whitePlayer;
 
   @ManyToOne
   @JoinColumn(name = "black_player_id")
-  private PlayerEntity blackPlayer;
+  private RegisteredPlayerEntity blackPlayer;
 
   @ManyToOne
   @JoinColumn(name = "winner_player_id")
-  private PlayerEntity winner;
+  private RegisteredPlayerEntity winner;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "game_result")

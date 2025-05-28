@@ -89,8 +89,8 @@ public class GameServiceImpl implements GameService {
   @Override
   public GameResponseDTO startGame(GameStartRequestDTO gameStartRequestDTO) {
     GameEntity gameEntity = gameRepository.findById(gameStartRequestDTO.getUuid()).orElseThrow();
-    PlayerEntity whitePlayer = playerRepository.findById(gameStartRequestDTO.getWhitePlayer()).orElseThrow();
-    PlayerEntity blackPlayer = playerRepository.findById(gameStartRequestDTO.getBlackPlayer()).orElseThrow();
+    RegisteredPlayerEntity whitePlayer = playerRepository.findById(gameStartRequestDTO.getWhitePlayer()).orElseThrow();
+    RegisteredPlayerEntity blackPlayer = playerRepository.findById(gameStartRequestDTO.getBlackPlayer()).orElseThrow();
 
     if (gameEntity.getWhitePlayer() == null) {
       checkIfPlayersHaveUnfinishedGames(List.of(whitePlayer));

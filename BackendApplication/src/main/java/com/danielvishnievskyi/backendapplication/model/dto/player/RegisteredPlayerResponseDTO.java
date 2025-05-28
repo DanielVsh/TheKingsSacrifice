@@ -8,8 +8,8 @@ import java.util.UUID;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class RegisteredPlayerResponseDTO extends PlayerResponseDTO {
+public class RegisteredPlayerResponseDTO {
+  private UUID uuid;
   private String nickname;
   private String email;
   private int rating;

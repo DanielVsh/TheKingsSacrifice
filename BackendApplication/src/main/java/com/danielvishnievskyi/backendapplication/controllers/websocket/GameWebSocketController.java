@@ -5,7 +5,7 @@ import com.danielvishnievskyi.backendapplication.model.dto.game.GameStartRequest
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameTimeResponseDTO;
 import com.danielvishnievskyi.backendapplication.model.entities.GameEntity;
 import com.danielvishnievskyi.backendapplication.model.entities.GameTimeEntity;
-import com.danielvishnievskyi.backendapplication.model.entities.PlayerEntity;
+import com.danielvishnievskyi.backendapplication.model.entities.RegisteredPlayerEntity;
 import com.danielvishnievskyi.backendapplication.model.enums.Color;
 import com.danielvishnievskyi.backendapplication.model.enums.GameState;
 import com.danielvishnievskyi.backendapplication.repositories.GameRepository;
@@ -18,13 +18,11 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
-import java.util.UUID;
 
 @Controller
 @Slf4j
@@ -78,7 +76,7 @@ public class GameWebSocketController {
       });
   }
 
-  private static void checkAndSetTimeout(boolean isTimeout, GameEntity gameEntity, PlayerEntity winner) {
+  private static void checkAndSetTimeout(boolean isTimeout, GameEntity gameEntity, RegisteredPlayerEntity winner) {
     if (isTimeout) {
       gameEntity
         .setWinner(winner)

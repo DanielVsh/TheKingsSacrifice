@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.1</version>
+		<version>3.5.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -17,7 +17,7 @@
 	<description>BackendApplication</description>
 
 	<properties>
-		<java.version>23</java.version>
+		<java.version>25</java.version>
 		<mapstruct.version>1.6.3</mapstruct.version>
 	</properties>
 
@@ -122,17 +122,17 @@
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
-			<version>0.12.5</version>
+			<version>0.12.6</version>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-orgjson</artifactId>
-			<version>0.12.5</version>
+			<version>0.12.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>8.0.1.Final</version>
+			<version>8.0.2.Final</version>
 		</dependency>
 
 		<dependency>
@@ -180,7 +180,7 @@
 						<compilerArg>-Amapstruct.verbose=true</compilerArg>
 						<compilerArg>-Amapstruct.unmappedTargetPolicy=ERROR</compilerArg>
 						<compilerArg>-Amapstruct.defaultComponentModel=spring</compilerArg>
-						<compilerArg>--enable-preview</compilerArg>
+<!--						<compilerArg>&#45;&#45;enable-preview</compilerArg>-->
 					</compilerArgs>
 				</configuration>
 			</plugin>

@@ -1,4 +1,4 @@
-package com.danielvishnievskyi.backendapplication.implementations;
+package com.danielvishnievskyi.backendapplication.security;
 
 import com.danielvishnievskyi.backendapplication.repositories.TokenRepository;
 import com.danielvishnievskyi.backendapplication.utils.JwtUtils;
@@ -65,6 +65,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         );
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authToken);
+      } else {
+        tokenRepository.findByToken(jwt).ifPresent(token -> {
+            token.setExpired(true);
+            tokenRepository.save(token);
+          }
+        );
+        response.setStatus(UNAUTHORIZED.value());
+        return;
       }
     }
     filterChain.doFilter(request, response);

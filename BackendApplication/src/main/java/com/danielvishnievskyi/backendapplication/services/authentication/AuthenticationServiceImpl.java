@@ -70,7 +70,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     RegisteredPlayerEntity registeredPlayer = playerRepo.findByEmail(requestDto.getEmail()).orElseThrow();//TODO: custom exception
     String jwtToken = jwtUtils.generateToken(Map.of("id", registeredPlayer.getUuid().toString()), registeredPlayer);
     String refreshToken = jwtUtils.generateRefreshToken(registeredPlayer);
-    authenticationUtils.deleteAllTokens(registeredPlayer);
     authenticationUtils.saveToken(registeredPlayer, jwtToken);
     return new AuthenticationResponseDTO(jwtToken, refreshToken);
   }
@@ -90,7 +89,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       RegisteredPlayerEntity registeredPlayer = playerRepo.findByEmail(username).orElseThrow(); //TODO: custom exception
       if (jwtUtils.isTokenValid(refreshToken, registeredPlayer)) {
         String accessToken = jwtUtils.generateToken(Map.of("id", registeredPlayer.getUuid().toString()), registeredPlayer);
-        authenticationUtils.deleteAllTokens(registeredPlayer);
         authenticationUtils.saveToken(registeredPlayer, accessToken);
         var authResponse = new AuthenticationResponseDTO(accessToken, refreshToken);
         new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
