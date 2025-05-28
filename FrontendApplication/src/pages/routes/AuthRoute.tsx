@@ -1,7 +1,7 @@
 import {Outlet, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {RootState} from "../../app/state/store.ts";
-import RegistrationModal from "../../components/RegistrationModal.tsx";
+import AuthenticationModal from "../../components/AuthenticationModal.tsx";
 import {decodeJwt} from "../../services/TokenService.ts";
 
 const isTokenExpired = (exp: number): boolean => {
@@ -36,8 +36,8 @@ export const AuthRoute = () => {
     ? <Outlet/>
     : <>
       <div className={`flex flex-col items-center justify-center h-screen`}>
-        <p className={'text-3xl'}>You need to register to access this page.</p>
-        <RegistrationModal/>
+        <p className={'text-3xl'}>You need to log in or register to access this page.</p>
+        <AuthenticationModal/>
         <div className={`text-2xl font-bold cursor-pointer hover:drop-shadow-lg pt-3.5`}>
           <button onClick={() => navigate('/')}>Main page</button>
         </div>

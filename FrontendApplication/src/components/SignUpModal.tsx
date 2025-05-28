@@ -6,11 +6,12 @@ import {motion} from "framer-motion";
 import {AiOutlineClose, AiOutlineGoogle, AiOutlineApple} from "react-icons/ai";
 import {FaEye, FaEyeSlash} from "react-icons/fa";
 import {GiChessPawn, GiChessKnight, GiChessRook, GiChessQueen} from "react-icons/gi";
-import {useCreateRegisteredPlayerMutation} from "../app/state/api/PlayerApi.ts";
+import {useCreateRegisteredPlayerMutation} from "../app/state/api/AuthApi";
 import {useDispatch} from "react-redux";
 import {setTokens} from "../app/state/reducers/PlayerReducer.ts";
 import {Dispatch} from "@reduxjs/toolkit";
 import {NavigateFunction, useNavigate} from "react-router-dom";
+import { MutationActionCreatorResult, MutationDefinition, BaseQueryFn, FetchArgs, FetchBaseQueryError, FetchBaseQueryMeta } from "@reduxjs/toolkit/query";
 
 const passwordSchema = z.string()
   .min(8, "Must be at least 8 characters")
@@ -47,7 +48,7 @@ const handleCreateRegisteredPlayer = async (
   },
   dispatch: Dispatch,
   navigate: NavigateFunction,
-  createRegisteredPlayer
+  createRegisteredPlayer: { (arg: CreatePlayerRequest): MutationActionCreatorResult<MutationDefinition<CreatePlayerRequest, BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError, {}, FetchBaseQueryMeta>, never, PlayerTokens, "playerApi">>; (arg0: { email: string; nickname: string; password: string; rating: number; }): { (): any; new(): any; unwrap: { (): any; new(): any; }; }; }
 ) => {
   let rating;
   if (data.skillLevel === "new") {

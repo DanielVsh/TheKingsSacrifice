@@ -9,11 +9,16 @@ import {determineGameState, determineWinner} from "../services/GameService.ts";
 import {useSelector} from "react-redux";
 import {RootState} from "../app/state/store.ts";
 
+interface PlayerTime {
+  whitePlayerTime: number;
+  blackPlayerTime: number;
+}
+
 
 export const PlayComponent: React.FC<GameResponse> = (props) => {
   const [stompClient, setStompClient] = useState<Client | null>(null);
   const [game, setGame] = useState(new Chess());
-  const [playersTime, setPlayersTime] = useState()
+  const [playersTime, setPlayersTime] = useState<PlayerTime>()
 
   const [saveGame] = useSaveGameMutation();
 
@@ -82,8 +87,17 @@ export const PlayComponent: React.FC<GameResponse> = (props) => {
     sendMove(game.fen());
 
     if (game.isGameOver()) {
-      const gameState = determineGameState(game);
-      const winner = gameState === GameState.CHECKMATE ? determineWinner(game, props) : null;
+      let gameState = determineGameState(game);
+      if (gameState === GameState.ERROR) {
+        if (playersTime && (playersTime.whitePlayerTime <= 0 || playersTime.blackPlayerTime <= 0)) {
+          gameState = GameState.TIMEOUT;
+        }
+      }
+      let winner = null;
+      if (gameState === GameState.CHECKMATE || gameState === GameState.TIMEOUT) {
+        winner = determineWinner(game, props);
+      }
+
       saveGame({
         uuid: props.uuid,
         gameResult: gameState,
@@ -104,21 +118,77 @@ export const PlayComponent: React.FC<GameResponse> = (props) => {
     return `${minutes}:${formattedSeconds}${formattedTenths}`;
   }
 
+  function getBeautyMoves(): string[] {
+    const moves = game.history() ?? [];
+    const groupedMoves = [];
+    for (let i = 0; i < moves.length; i += 2) {
+      const white = moves[i];
+      const black = moves[i + 1] ?? '';
+      groupedMoves.push({ number: Math.floor(i / 2) + 1, white, black });
+    }
+    return groupedMoves.map(({ number, white, black }) => (
+      <li key={number}>
+        {number}. {white} {black}
+      </li>
+    ));
+  }
+
   return (
-    <>
-      <div className={`flex justify-center items-center min-h-screen`}>
-        <a>Anonymous player</a>
-        {playersTime && formatTime(playersTime.whitePlayerTime)}
-        {player &&
+    <div className="flex h-screen w-full bg-black text-white font-sans">
+      {/* Center content */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4">
+        {/* Top Player Info */}
+        <div className="text-center mb-4">
+          <p className="text-lg font-semibold">{props.whitePlayer?.nickname}</p>
+          {playersTime && <p className="text-sm text-gray-400">{formatTime(playersTime.whitePlayerTime)}</p>}
+        </div>
+
+        {/* Chess Board */}
+        {player && (
+          <div className="shadow-lg rounded-md overflow-hidden">
             <ChessGameBoard
-                game={game}
-                onUserMove={handleUserMove}
-                boardOrientation={getBoardOrientation()}
-                canPlayerMove={canPlayerMove()}/>
-        }
-        <a>Anonymous player</a>
-        {playersTime && formatTime(playersTime.blackPlayerTime)}
-      </div>
-    </>
-  )
+              game={game}
+              onUserMove={handleUserMove}
+              boardOrientation={getBoardOrientation()}
+              canPlayerMove={canPlayerMove()}
+            />
+          </div>
+        )}
+
+        {/* Bottom Player Info */}
+        <div className="text-center mt-4">
+          <p className="text-lg font-semibold">{props.blackPlayer?.nickname}</p>
+          {playersTime && <p className="text-sm text-gray-400">{formatTime(playersTime.blackPlayerTime)}</p>}
+        </div>
+      </main>
+
+      {/* Right Panel */}
+      <aside className="w-[340px] p-4 flex flex-col bg-neutral-900 border-l border-neutral-800">
+        {/* Move List */}
+        <div className="mb-6">
+          <h3 className="text-lg font-bold mb-2">Moves</h3>
+          <div className="border border-white/10 rounded p-2 h-48 overflow-y-auto bg-black">
+            <ul className="text-sm space-y-1 text-gray-200">
+              {getBeautyMoves()}
+            </ul>
+          </div>
+        </div>
+
+        {/* Chat Box */}
+        <div className="flex-1 flex flex-col border border-white/10 rounded p-2 bg-black">
+          <h3 className="text-lg font-bold mb-2">Chat</h3>
+          <div className="flex-1 overflow-y-auto text-sm text-gray-300 space-y-1 mb-2">
+            <p>Player1: Good luck!</p>
+            <p>Player2: You too!</p>
+          </div>
+          <input
+            type="text"
+            placeholder="Type a message..."
+            className="bg-neutral-800 text-white text-sm px-3 py-2 rounded focus:outline-none placeholder-gray-500"
+          />
+        </div>
+      </aside>
+    </div>
+  );
+
 };

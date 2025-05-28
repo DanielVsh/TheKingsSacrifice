@@ -1,7 +1,7 @@
 interface GameResponse {
   uuid: string
-  whitePlayer: AnonymousPlayerResponse | null
-  blackPlayer: AnonymousPlayerResponse | null
+  whitePlayer: RegisteredPlayerResponse | null
+  blackPlayer: RegisteredPlayerResponse | null
   history: string[]
   winner: string | null
   gameResult: GameState

@@ -3,17 +3,24 @@ import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { gameApi } from "./api/GameApi";
-import playerReducer from "./reducers/PlayerReducer";
+import { authApi } from "./api/AuthApi";
 import { playerApi } from "./api/PlayerApi";
+import playerReducer from "./reducers/PlayerReducer";
+
 
 const persistConfig = {
   key: "root",
   storage,
-  blacklist: [gameApi.reducerPath, playerApi.reducerPath]
+  blacklist: [
+    gameApi.reducerPath,
+    authApi.reducerPath,
+    playerApi.reducerPath
+  ]
 };
 
 const rootReducer = combineReducers({
   [gameApi.reducerPath]: gameApi.reducer,
+  [authApi.reducerPath]: authApi.reducer,
   [playerApi.reducerPath]: playerApi.reducer,
   playerReducer,
 });
@@ -27,7 +34,11 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
       },
-    }).concat(gameApi.middleware, playerApi.middleware),
+    }).concat(
+      gameApi.middleware,
+      authApi.middleware,
+      playerApi.middleware,
+    ),
 });
 
 setupListeners(store.dispatch);

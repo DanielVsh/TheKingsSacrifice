@@ -18,3 +18,8 @@ interface CreatePlayerRequest {
   password: string;
   rating: number;
 }
+
+interface AuthenticatePlayerRequest {
+  email: string;
+  password: string;
+}

@@ -7,6 +7,7 @@ import {OnlinePage} from "./pages/OnlinePage.tsx";
 import {AuthRoute} from "./pages/routes/AuthRoute.tsx";
 import AppLayout from "./pages/routes/AppLayout.tsx";
 import {DashboardPage} from "./pages/DashboardPage.tsx";
+import LogoutPage from "./pages/LogoutPage.tsx";
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
               <Route path={'/dashboard'} element={<DashboardPage/>} />
               <Route path={'/play/online/:id'} element={<PlayPage/>}/>
               <Route path={'/play/online/'} element={<OnlinePage/>}/>
+              <Route path={'/logout'} element={<LogoutPage/>}/>
             </Route>
             <Route path={'*'} element={<NotFoundPage/>}/>
         </Route>

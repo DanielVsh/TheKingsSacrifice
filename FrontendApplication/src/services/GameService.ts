@@ -9,6 +9,10 @@ export const determineGameState = (game: Chess) => {
     return GameState.DRAW_BY_INSUFFICIENT_MATERIAL;
   } else if (game.isCheckmate()) {
     return GameState.CHECKMATE;
+  } else if (game.isDraw()) {
+    return GameState.DRAW_AGREEMENT;
+  } else if (game.isDrawByFiftyMoves()) {
+    return GameState.DRAW_BY_FIFTY_MOVES_RULE;
   }
 
   return GameState.ERROR;

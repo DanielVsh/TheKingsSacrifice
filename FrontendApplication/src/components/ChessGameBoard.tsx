@@ -165,11 +165,11 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
 
   return (
     <>
-      <div className={''}>
+      <div className={'flex justify-center items-center w-full h-full'}>
         <Chessboard id={"GameBoard"}
                     boardOrientation={props.boardOrientation}
                     position={props.game.fen()}
-                    boardWidth={500}
+                    boardWidth={600}
                     arePremovesAllowed={true}
                     onPieceDrop={onPieceDrop}
                     onPieceDragBegin={onPieceDragBegin}
