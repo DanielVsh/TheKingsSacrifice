@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useAuthenticateRegisteredPlayerMutation } from "../app/state/api/AuthApi";
+import { useAuthenticateRegisteredPlayerMutation } from "../app/state/api/AuthApi.ts";
 import { useDispatch } from "react-redux";
 import { setTokens } from "../app/state/reducers/PlayerReducer.ts";
 import { useNavigate } from "react-router-dom";

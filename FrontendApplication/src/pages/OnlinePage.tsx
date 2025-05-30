@@ -3,6 +3,7 @@ import {useCreateGameMutation} from "../app/state/api/GameApi.ts";
 import {useSelector} from "react-redux";
 import {RootState} from "../app/state/store.ts";
 import {useState} from "react";
+import {GameResponse} from "../app/interfaces/IGame.ts";
 
 export const OnlinePage = () => {
 

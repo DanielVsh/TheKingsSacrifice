@@ -6,6 +6,7 @@ import SockJS from "sockjs-client";
 import {backendIp} from "../app/config/backend.ts";
 import {Client, Stomp} from "@stomp/stompjs";
 import CopyUrlButton from "../components/CopyUrlButton.tsx";
+import {GameResponse} from "../app/interfaces/IGame.ts";
 
 export const WaitingRoomPage: React.FC<GameResponse> = (props) => {
 

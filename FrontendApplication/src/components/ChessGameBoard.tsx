@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {Piece, PromotionPieceOption, Square} from "react-chessboard/dist/chessboard/types";
 import {Chess, Move} from "chess.js";
 import {Chessboard} from "react-chessboard";
+import {SoundService} from "../services/SoundService.ts";
 
 type SquareOptions = {
   background: string;
@@ -92,6 +93,9 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
       setMoveFrom(null);
       setMoveTo(null);
       setOptionSquares({});
+
+      SoundService.play("move")
+
       return;
     }
   }

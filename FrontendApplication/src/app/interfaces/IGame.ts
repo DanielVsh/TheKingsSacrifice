@@ -1,27 +1,36 @@
-interface GameResponse {
+import {GameState} from "../enums/GameState.ts";
+
+export interface GameResponse {
   uuid: string
   whitePlayer: RegisteredPlayerResponse | null
   blackPlayer: RegisteredPlayerResponse | null
   history: string[]
-  winner: string | null
+  winner: RegisteredPlayerResponse | null
   gameResult: GameState
-  date: Date
+  createdAt: Date
+  finishedAt: Date
 }
 
-interface GameCreateRequest {
+export interface GameCreateRequest {
   whitePlayer: string | null
   blackPlayer: string | null
   timeFormat: string
 }
 
-interface GameStartRequest {
+export interface GameStartRequest {
   uuid: string
   whitePlayer: string
   blackPlayer: string
 }
 
-interface GameSaveRequest {
+export interface GameSaveRequest {
   uuid: string
   winner: string | null
   gameResult: GameState
+}
+
+export interface GameDrawRequest {
+  fromPlayer: RegisteredPlayerResponse,
+  toPlayer: RegisteredPlayerResponse,
+  status: "REQUESTED" | "ACCEPTED" | "REJECTED"
 }

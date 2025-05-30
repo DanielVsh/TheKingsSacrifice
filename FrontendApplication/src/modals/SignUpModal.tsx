@@ -6,7 +6,7 @@ import {motion} from "framer-motion";
 import {AiOutlineClose, AiOutlineGoogle, AiOutlineApple} from "react-icons/ai";
 import {FaEye, FaEyeSlash} from "react-icons/fa";
 import {GiChessPawn, GiChessKnight, GiChessRook, GiChessQueen} from "react-icons/gi";
-import {useCreateRegisteredPlayerMutation} from "../app/state/api/AuthApi";
+import {useCreateRegisteredPlayerMutation} from "../app/state/api/AuthApi.ts";
 import {useDispatch} from "react-redux";
 import {setTokens} from "../app/state/reducers/PlayerReducer.ts";
 import {Dispatch} from "@reduxjs/toolkit";

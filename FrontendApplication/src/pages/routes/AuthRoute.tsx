@@ -1,7 +1,7 @@
 import {Outlet, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {RootState} from "../../app/state/store.ts";
-import AuthenticationModal from "../../components/AuthenticationModal.tsx";
+import AuthenticationModal from "../../modals/AuthenticationModal.tsx";
 import {decodeJwt} from "../../services/TokenService.ts";
 
 const isTokenExpired = (exp: number): boolean => {
