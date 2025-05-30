@@ -22,7 +22,8 @@ public class GameResponseDTO {
   private List<String> history;
   private RegisteredPlayerResponseDTO winner;
   private GameState gameResult;
-  private LocalDateTime date;
+  private LocalDateTime createdAt;
+  private LocalDateTime finishedAt;
   private TimeFormat timeFormat;
   private GameTimeResponseDTO playersTime;
 }

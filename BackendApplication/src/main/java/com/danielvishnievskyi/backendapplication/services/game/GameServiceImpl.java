@@ -1,7 +1,10 @@
 package com.danielvishnievskyi.backendapplication.services.game;
 
 import com.danielvishnievskyi.backendapplication.model.TimeFormat;
-import com.danielvishnievskyi.backendapplication.model.dto.game.*;
+import com.danielvishnievskyi.backendapplication.model.dto.game.GameCreateRequestDTO;
+import com.danielvishnievskyi.backendapplication.model.dto.game.GameResponseDTO;
+import com.danielvishnievskyi.backendapplication.model.dto.game.GameSaveRequestDTO;
+import com.danielvishnievskyi.backendapplication.model.dto.game.GameStartRequestDTO;
 import com.danielvishnievskyi.backendapplication.model.entities.GameEntity;
 import com.danielvishnievskyi.backendapplication.model.entities.GameTimeEntity;
 import com.danielvishnievskyi.backendapplication.model.entities.PlayerEntity;
@@ -36,9 +39,13 @@ public class GameServiceImpl implements GameService {
   }
 
   @Override
-  public GameResponseDTO saveGame(GameSaveRequestDTO gameSaveRequestDTO) {
-    GameEntity gameEntity = gameRepository.findById(gameSaveRequestDTO.getUuid()).orElseThrow();
-    gameEntity.setWinner(gameSaveRequestDTO.getWinner());
+  public GameResponseDTO saveGame(UUID uuid, GameSaveRequestDTO gameSaveRequestDTO) {
+    GameEntity gameEntity = gameRepository.findById(uuid).orElseThrow();
+    if (gameSaveRequestDTO.getWinner() == null) {
+      gameEntity.setWinner(null);
+    } else {
+      gameEntity.setWinner(playerRepository.findById(gameSaveRequestDTO.getWinner()).orElseThrow());
+    }
     gameEntity.setGameResult(gameSaveRequestDTO.getGameResult());
     return gameMapper.mapToResponseDTO(gameEntity);
   }
@@ -87,8 +94,8 @@ public class GameServiceImpl implements GameService {
   }
 
   @Override
-  public GameResponseDTO startGame(GameStartRequestDTO gameStartRequestDTO) {
-    GameEntity gameEntity = gameRepository.findById(gameStartRequestDTO.getUuid()).orElseThrow();
+  public GameResponseDTO startGame(UUID uuid, GameStartRequestDTO gameStartRequestDTO) {
+    GameEntity gameEntity = gameRepository.findById(uuid).orElseThrow();
     RegisteredPlayerEntity whitePlayer = playerRepository.findById(gameStartRequestDTO.getWhitePlayer()).orElseThrow();
     RegisteredPlayerEntity blackPlayer = playerRepository.findById(gameStartRequestDTO.getBlackPlayer()).orElseThrow();
 
@@ -109,6 +116,10 @@ public class GameServiceImpl implements GameService {
   public GameResponseDTO updateGameMove(String gameId, String fen) {
     GameEntity gameEntity = gameRepository.findById(UUID.fromString(gameId))
       .orElseThrow(() -> new RuntimeException("Game[%s] not found".formatted(gameId)));
+
+    if (gameEntity.getGameResult() != GameState.ONGOING && gameEntity.getGameResult() != GameState.CREATED) {
+      throw new RuntimeException("Game[%s] is not in ONGOING state".formatted(gameId));
+    }
 
     gameEntity.getHistory().add(fen);
 

@@ -46,8 +46,11 @@ public class GameEntity {
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
   private GameTimeEntity gameTime;
 
-  @Column(name = "date")
-  private LocalDateTime date;
+  @Column(name = "created_date")
+  private LocalDateTime createdAt;
+
+  @Column(name = "finished_date")
+  private LocalDateTime finishedAt;
 
   @ElementCollection(fetch = FetchType.EAGER)
   private List<String> history;
@@ -56,7 +59,7 @@ public class GameEntity {
 
   @PrePersist
   public void prePersist() {
-    this.date = LocalDateTime.now();
+    this.createdAt = LocalDateTime.now();
   }
 
   public int getBasicGameTime() {
@@ -65,5 +68,24 @@ public class GameEntity {
 
   public int getIncreaseTimePerMove() {
     return Integer.parseInt(getTimeFormat().split("\\+")[1]);
+  }
+
+  public GameEntity setWinner(RegisteredPlayerEntity winner) {
+    if (this.winner == null) {
+      this.winner = winner;
+    }
+    return this;
+  }
+
+  public GameEntity setGameResult(GameState gameResult) {
+    if (this.gameResult == null) {
+      this.gameResult = GameState.CREATED;
+    } else if (this.gameResult == GameState.CREATED && gameResult == GameState.ONGOING) {
+      this.gameResult = GameState.ONGOING;
+    } else if (this.gameResult == GameState.ONGOING) {
+      this.finishedAt = LocalDateTime.now();
+      this.gameResult = gameResult;
+    }
+    return this;
   }
 }

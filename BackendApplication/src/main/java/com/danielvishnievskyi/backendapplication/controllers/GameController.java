@@ -1,9 +1,9 @@
 package com.danielvishnievskyi.backendapplication.controllers;
 
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameCreateRequestDTO;
-import com.danielvishnievskyi.backendapplication.model.dto.game.GameStartRequestDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameResponseDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameSaveRequestDTO;
+import com.danielvishnievskyi.backendapplication.model.dto.game.GameStartRequestDTO;
 import com.danielvishnievskyi.backendapplication.services.game.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +29,19 @@ public class GameController {
     return ResponseEntity.ok(gameService.createGame(gameCreateRequestDTO));
   }
 
-  @PostMapping("/start")
-  public ResponseEntity<GameResponseDTO> start(@RequestBody GameStartRequestDTO gameStartRequestDTO) {
-    return ResponseEntity.ok(gameService.startGame(gameStartRequestDTO));
+  @PostMapping("/{uuid}/start")
+  public ResponseEntity<GameResponseDTO> start(
+    @PathVariable UUID uuid,
+    @RequestBody GameStartRequestDTO gameStartRequestDTO
+  ) {
+    return ResponseEntity.ok(gameService.startGame(uuid, gameStartRequestDTO));
   }
 
-  @PostMapping("/save")
-  public ResponseEntity<GameResponseDTO> save(@RequestBody GameSaveRequestDTO gameCreateRequestDTO) {
-    return ResponseEntity.ok(gameService.saveGame(gameCreateRequestDTO));
+  @PostMapping("/{uuid}/save")
+  public ResponseEntity<GameResponseDTO> save(
+    @PathVariable UUID uuid,
+    @RequestBody GameSaveRequestDTO gameCreateRequestDTO
+  ) {
+    return ResponseEntity.ok(gameService.saveGame(uuid, gameCreateRequestDTO));
   }
 }

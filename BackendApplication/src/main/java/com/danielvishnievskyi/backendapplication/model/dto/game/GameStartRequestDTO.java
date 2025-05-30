@@ -10,7 +10,6 @@ import java.util.UUID;
 @ToString
 @AllArgsConstructor
 public class GameStartRequestDTO {
-  private UUID uuid;
   private UUID whitePlayer;
   private UUID blackPlayer;
 }

@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @Slf4j
@@ -33,16 +34,29 @@ public class GameWebSocketController {
   private final GameRepository gameRepository;
   private final GameService gameService;
 
-  @MessageMapping("/game/{gameId}/move")
+  @MessageMapping("/game/{gameuuid}/move")
   public void makeMove(
-    @DestinationVariable String gameId,
+    @DestinationVariable String gameuuid,
     @Payload String fen
     ) {
-    GameResponseDTO gameResponseDTO = gameService.updateGameMove(gameId, fen);
+    GameResponseDTO gameResponseDTO = gameService.updateGameMove(gameuuid, fen);
 
-    messagingTemplate.convertAndSend("/topic/game/" + gameId,
+    messagingTemplate.convertAndSend("/topic/game/" + gameuuid,
       gameResponseDTO.getHistory().getLast()
     );
+  }
+
+
+  @MessageMapping("/game/{gameuuid}/start")
+  public void startGame(
+    @DestinationVariable UUID gameuuid,
+    @Payload GameStartRequestDTO gameStartRequestDTO
+  ) {
+    GameResponseDTO gameResponseDTO = gameService.startGame(gameuuid, gameStartRequestDTO);
+
+    log.info("game[{}] started with white[{}] and black[{}] players",
+      gameResponseDTO.getUuid(), gameResponseDTO.getWhitePlayer(), gameResponseDTO.getBlackPlayer());
+    messagingTemplate.convertAndSend("/topic/game/" + gameuuid + "/started", "true");
   }
 
   @Transactional
@@ -89,15 +103,4 @@ public class GameWebSocketController {
     }
   }
 
-  @MessageMapping("/game/{gameId}/start")
-  public void startGame(
-      @DestinationVariable String gameId,
-      @Payload GameStartRequestDTO gameStartRequestDTO
-      ) {
-    GameResponseDTO gameResponseDTO = gameService.startGame(gameStartRequestDTO);
-
-    log.info("game[{}] started with white[{}] and black[{}] players",
-      gameResponseDTO.getUuid(), gameResponseDTO.getWhitePlayer(), gameResponseDTO.getBlackPlayer());
-    messagingTemplate.convertAndSend("/topic/game/" + gameId + "/started", "true");
-  }
 }
