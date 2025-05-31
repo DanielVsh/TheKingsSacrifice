@@ -10,11 +10,15 @@ import {useSelector} from "react-redux";
 import {RootState} from "../app/state/store.ts";
 import {determineGameResult} from "../services/GameService.ts";
 import {GameResult} from "../app/enums/GameResult.ts";
+import {useUpdatePlayerMutation} from "../app/state/api/PlayerApi.ts";
+import {EloService} from "../services/EloService.ts";
 
 export const PlayPage = () => {
   const {id} = useParams();
   const gameID: string = id as string;
   const player = useSelector((state: RootState) => state.playerReducer.player !!);
+
+  const [updatePlayer] = useUpdatePlayerMutation();
 
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
 
@@ -25,8 +29,23 @@ export const PlayPage = () => {
     if (gameResult !== GameResult.ONGOING && !isResultModalOpen) {
       setIsResultModalOpen(true);
     }
+
   }, [data]);
 
+  useEffect(() => {
+    if (gameResult && gameResult !== GameResult.ONGOING && data?.whitePlayer && data.blackPlayer) {
+      const {newWhiteRating, newBlackRating} = eloService.calculateNewRatings(
+        data.whitePlayer.rating,
+        data.blackPlayer.rating,
+        gameResult
+      );
+
+      updatePlayer({uuid: data.whitePlayer.uuid, rating: newWhiteRating});
+      updatePlayer({uuid: data.blackPlayer.uuid, rating: newBlackRating});
+    }
+  }, [gameResult])
+
+  const eloService = new EloService();
 
   if (isLoading) return <LoadingElement/>
   if (isError) return <NotFoundPage/>

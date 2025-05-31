@@ -7,7 +7,7 @@ export const authApi = createApi({
     baseUrl: `${backendIp}/rest/auth`,
   }),
   endpoints: (builder) => ({
-    createRegisteredPlayer: builder.mutation<PlayerTokens, CreatePlayerRequest>({
+    createRegisteredPlayer: builder.mutation<PlayerTokens, RegisteredPlayerRequest>({
       query: (arg) => ({
         url: `/register`,
         method: "POST",

@@ -14,13 +14,24 @@ export const playerApi = createApi({
       return headers;
     },
   }),
+  tagTypes: ['Player'],
   endpoints: (builder) => ({
     getPlayerData: builder.query<RegisteredPlayerResponse , void>({
       query: () => "/me",
+      providesTags: ['Player']
+    }),
+    updatePlayer: builder.mutation<RegisteredPlayerResponse , RegisteredPlayerRequest>({
+      query: (arg) => ({
+        url: `/${arg.uuid}/update`,
+        method: `PATCH`,
+        body: arg
+      }),
+      invalidatesTags: ['Player']
     }),
   }),
 })
 
 export const {
   useGetPlayerDataQuery,
+  useUpdatePlayerMutation,
 } = playerApi

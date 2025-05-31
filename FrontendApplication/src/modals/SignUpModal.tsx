@@ -48,7 +48,7 @@ const handleCreateRegisteredPlayer = async (
   },
   dispatch: Dispatch,
   navigate: NavigateFunction,
-  createRegisteredPlayer: { (arg: CreatePlayerRequest): MutationActionCreatorResult<MutationDefinition<CreatePlayerRequest, BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError, {}, FetchBaseQueryMeta>, never, PlayerTokens, "playerApi">>; (arg0: { email: string; nickname: string; password: string; rating: number; }): { (): any; new(): any; unwrap: { (): any; new(): any; }; }; }
+  createRegisteredPlayer: { (arg: RegisteredPlayerRequest): MutationActionCreatorResult<MutationDefinition<RegisteredPlayerRequest, BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError, {}, FetchBaseQueryMeta>, never, PlayerTokens, "playerApi">>; (arg0: { email: string; nickname: string; password: string; rating: number; }): { (): any; new(): any; unwrap: { (): any; new(): any; }; }; }
 ) => {
   let rating;
   if (data.skillLevel === "new") {
@@ -79,7 +79,7 @@ const SignupModal = ({isOpen, onClose}: SignupModalProps) => {
   const [skillLevel, setSkillLevel] = useState<FormData["skillLevel"]>("new");
   const dispatch = useDispatch()
   const navigate = useNavigate();
-  const [createRegisteredPlayer] = useCreateRegisteredPlayerMutation<CreatePlayerRequest>();
+  const [createRegisteredPlayer] = useCreateRegisteredPlayerMutation<RegisteredPlayerRequest>();
 
   const {register, handleSubmit, setValue, formState: {errors, isValid}} = useForm<FormData>({
     resolver: zodResolver(formSchema),

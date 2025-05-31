@@ -12,11 +12,12 @@ interface PlayerTokens {
   refreshToken: string;
 }
 
-interface CreatePlayerRequest {
-  email: string;
-  nickname: string;
-  password: string;
-  rating: number;
+interface RegisteredPlayerRequest {
+  uuid: string;
+  email?: string;
+  nickname?: string;
+  password?: string;
+  rating?: number;
 }
 
 interface AuthenticatePlayerRequest {
