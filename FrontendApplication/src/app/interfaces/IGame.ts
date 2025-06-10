@@ -34,3 +34,15 @@ export interface GameDrawRequest {
   toPlayer: RegisteredPlayerResponse,
   status: "REQUESTED" | "ACCEPTED" | "REJECTED"
 }
+
+
+export interface PlayerMatchRequest {
+  playerUUID: string
+  rating: number
+  timeFormat: string,
+}
+
+export interface MatchmakingQueueSize {
+  total: number
+  byTimeMode: number
+}

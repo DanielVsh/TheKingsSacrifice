@@ -20,7 +20,7 @@ interface PlayerTime {
 }
 
 interface PlayComponentProps extends GameResponse {
-  refetch: () => void;
+
 }
 
 let isBeginGameSoundPlayed = false;
@@ -42,27 +42,27 @@ export const PlayComponent: React.FC<PlayComponentProps> = (props) => {
 
   const {sendMessage} = useWebSocket([
     {
-      topic: `/game/${props.uuid}/draw`,
+      topic: `/topic/game/${props.uuid}/draw`,
       handler: (message) => {
         const parsed = JSON.parse(message) as GameDrawRequest;
         drawService.handleDrawRequest(parsed);
       },
     },
     {
-      topic: `/game/${props.uuid}`,
+      topic: `/topic/game/${props.uuid}`,
       handler: (message: string) => {
         setGame(new Chess(message));
       },
     },
     {
-      topic: `/game/${props.uuid}/time`,
+      topic: `/topic/game/${props.uuid}/time`,
       handler: (message) => {
         message = JSON.parse(message) as PlayerTime;
         setPlayersTime(message)
       },
     },
     {
-      topic: `/game/${props.uuid}/saved`,
+      topic: `/topic/game/${props.uuid}/saved`,
       handler: (message) => {
         message = JSON.parse(message) as GameResponse;
         setPlayersTime(message)
@@ -153,7 +153,6 @@ export const PlayComponent: React.FC<PlayComponentProps> = (props) => {
         gameResult: gameState,
         winner: winner?.uuid ?? null,
       });
-      props.refetch()
     }
   };
 

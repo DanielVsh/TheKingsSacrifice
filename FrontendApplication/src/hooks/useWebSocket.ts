@@ -2,6 +2,8 @@ import {useEffect, useState} from 'react';
 import {Client, IMessage, Stomp} from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import {backendIp} from "../app/config/backend.ts";
+import {useSelector} from "react-redux";
+import {RootState} from "../app/state/store.ts";
 
 type TopicHandler = {
   topic: string;
@@ -14,7 +16,9 @@ type SendOptions = {
 };
 
 export function useWebSocket(topicHandlers: TopicHandler[]) {
-  const [stompClient, setStompClient] = useState<Client | null>(null);;
+  const [stompClient, setStompClient] = useState<Client | null>(null);
+
+  const access_token = useSelector((state: RootState) => state.playerReducer.accessToken)!!
 
   function webSocketConnection() {
     const sock = new SockJS(`${backendIp}/ws`);
@@ -25,13 +29,15 @@ export function useWebSocket(topicHandlers: TopicHandler[]) {
 
     const onConnect = () => {
       topicHandlers.forEach(({topic, handler}) => {
-        client.subscribe(`/topic` + topic, (message: IMessage) => {
+        client.subscribe(topic, (message: IMessage) => {
           handler(message.body);
         });
       })
     }
 
-    client.connect({}, onConnect);
+    client.connect({
+      Authorization: `Bearer ${access_token}`,
+    }, onConnect);
 
     return client;
   }

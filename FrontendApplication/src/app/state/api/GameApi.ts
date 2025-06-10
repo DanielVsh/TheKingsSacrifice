@@ -1,11 +1,19 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {backendIp} from "../../config/backend.ts";
 import {GameCreateRequest, GameResponse, GameSaveRequest, GameStartRequest} from "../../interfaces/IGame.ts";
+import {RootState} from "../store.ts";
 
 export const gameApi = createApi({
   reducerPath: 'gameApi',
   baseQuery: fetchBaseQuery({
     baseUrl: `${backendIp}/rest/game`,
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).playerReducer.accessToken;
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   tagTypes: ['Game'],
   endpoints: (builder) => ({
