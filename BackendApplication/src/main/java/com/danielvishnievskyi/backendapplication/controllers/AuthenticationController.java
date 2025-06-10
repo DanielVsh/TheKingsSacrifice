@@ -3,7 +3,7 @@ package com.danielvishnievskyi.backendapplication.controllers;
 import com.danielvishnievskyi.backendapplication.model.dto.authentication.AuthenticationRequestDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.authentication.AuthenticationResponseDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.authentication.RegisterRequestDTO;
-import com.danielvishnievskyi.backendapplication.services.authentication.AuthenticationService;
+import com.danielvishnievskyi.backendapplication.services.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

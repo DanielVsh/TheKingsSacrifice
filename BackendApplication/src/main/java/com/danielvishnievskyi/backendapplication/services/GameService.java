@@ -1,4 +1,4 @@
-package com.danielvishnievskyi.backendapplication.services.game;
+package com.danielvishnievskyi.backendapplication.services;
 
 
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameCreateRequestDTO;

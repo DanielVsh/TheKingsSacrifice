@@ -1,4 +1,4 @@
-package com.danielvishnievskyi.backendapplication.services.game;
+package com.danielvishnievskyi.backendapplication.services;
 
 import com.danielvishnievskyi.backendapplication.model.TimeFormat;
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameCreateRequestDTO;
@@ -16,6 +16,7 @@ import com.danielvishnievskyi.backendapplication.repositories.GameRepository;
 import com.danielvishnievskyi.backendapplication.repositories.RegisteredPlayerRepository;
 import com.danielvishnievskyi.backendapplication.utils.FenUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -32,6 +33,7 @@ public class GameServiceImpl implements GameService {
   private final GameRepository gameRepository;
   private final RegisteredPlayerRepository playerRepository;
   private final GameMapper gameMapper;
+  private final SimpMessagingTemplate messagingTemplate;
 
   @Override
   public GameResponseDTO getGame(UUID uuid) {
@@ -47,7 +49,11 @@ public class GameServiceImpl implements GameService {
       gameEntity.setWinner(playerRepository.findById(gameSaveRequestDTO.getWinner()).orElseThrow());
     }
     gameEntity.setGameResult(gameSaveRequestDTO.getGameResult());
-    return gameMapper.mapToResponseDTO(gameEntity);
+
+    GameResponseDTO gameResponseDTO = gameMapper.mapToResponseDTO(gameEntity);
+    messagingTemplate.convertAndSend("/topic/game/" + gameEntity.getUuid() + "/finished", gameResponseDTO);
+
+    return gameResponseDTO;
   }
 
   @Override
@@ -69,7 +75,10 @@ public class GameServiceImpl implements GameService {
     } else {
       playerEntities.add(blackPlayer.get());
     }
-    checkIfPlayersHaveUnfinishedGames(playerEntities);
+    Optional<GameEntity> playersUnfinishedGame = getPlayersUnfinishedGame(playerEntities);
+    if (playersUnfinishedGame.isPresent()) {
+      return gameMapper.mapToResponseDTO(playersUnfinishedGame.get());
+    }
 
     GameEntity gameEntity = GameEntity.builder()
       .whitePlayer(whitePlayer.orElse(null))
@@ -85,12 +94,26 @@ public class GameServiceImpl implements GameService {
     return gameMapper.mapToResponseDTO(gameRepository.save(gameEntity));
   }
 
-  private void checkIfPlayersHaveUnfinishedGames(List<PlayerEntity> playerEntities) {
-    if (!CollectionUtils.isEmpty(gameRepository.getGamesByPlayersAndGameResult(
+  private Optional<GameEntity> getPlayersUnfinishedGame(List<PlayerEntity> playerEntities) {
+    List<GameEntity> unfinishedGames = gameRepository.getGamesByPlayersAndGameResult(
       playerEntities, List.of(GameState.ONGOING, GameState.CREATED)
-    ))) {
-      throw new RuntimeException("Players already have created game");
+    );
+
+    if (CollectionUtils.isEmpty(unfinishedGames)) {
+      return Optional.empty();
     }
+
+    if (unfinishedGames.size() > 2) {
+      throw new RuntimeException("Players have more then 1 ongoing game");
+    }
+
+    if (unfinishedGames.size() == 2 &&
+      !unfinishedGames.getFirst().getUuid().equals(unfinishedGames.getLast().getUuid())
+    ) {
+      throw new RuntimeException("Players have different ongoing games");
+    }
+
+    return Optional.of(unfinishedGames.getFirst());
   }
 
   @Override
@@ -100,9 +123,9 @@ public class GameServiceImpl implements GameService {
     RegisteredPlayerEntity blackPlayer = playerRepository.findById(gameStartRequestDTO.getBlackPlayer()).orElseThrow();
 
     if (gameEntity.getWhitePlayer() == null) {
-      checkIfPlayersHaveUnfinishedGames(List.of(whitePlayer));
+      getPlayersUnfinishedGame(List.of(whitePlayer));
     } else if (gameEntity.getBlackPlayer() == null) {
-      checkIfPlayersHaveUnfinishedGames(List.of(blackPlayer));
+      getPlayersUnfinishedGame(List.of(blackPlayer));
     }
 
     gameEntity.setWhitePlayer(whitePlayer);

@@ -1,6 +1,7 @@
 package com.danielvishnievskyi.backendapplication.model.entities;
 
 import com.danielvishnievskyi.backendapplication.model.enums.GameState;
+import com.danielvishnievskyi.backendapplication.utils.GameEloRatingUtils;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -85,7 +86,14 @@ public class GameEntity {
     } else if (this.gameResult == GameState.ONGOING) {
       this.finishedAt = LocalDateTime.now();
       this.gameResult = gameResult;
+
+      updatePlayersRating();
     }
     return this;
   }
+
+  private void updatePlayersRating() {
+    GameEloRatingUtils.calculateNewRatings(this);
+  }
+
 }

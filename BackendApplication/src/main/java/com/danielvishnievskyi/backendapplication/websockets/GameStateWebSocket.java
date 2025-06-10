@@ -1,4 +1,4 @@
-package com.danielvishnievskyi.backendapplication.controllers.websocket;
+package com.danielvishnievskyi.backendapplication.websockets;
 
 import com.danielvishnievskyi.backendapplication.model.dto.game.DrawMessageDTO;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequestMapping("/ws")
 @Transactional
 @RequiredArgsConstructor
-public class GameStateWebSocketController {
+public class GameStateWebSocket {
   private final SimpMessagingTemplate messagingTemplate;
 
   @MessageMapping("/game/{gameuuid}/draw/request")

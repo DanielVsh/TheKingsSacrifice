@@ -1,4 +1,4 @@
-package com.danielvishnievskyi.backendapplication.services.authentication;
+package com.danielvishnievskyi.backendapplication.services;
 
 import com.danielvishnievskyi.backendapplication.model.dto.authentication.AuthenticationRequestDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.authentication.AuthenticationResponseDTO;

@@ -1,4 +1,4 @@
-package com.danielvishnievskyi.backendapplication.services.player;
+package com.danielvishnievskyi.backendapplication.services;
 
 import com.danielvishnievskyi.backendapplication.model.dto.player.RegisteredPlayerRequestDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.player.RegisteredPlayerResponseDTO;

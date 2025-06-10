@@ -4,10 +4,9 @@ import com.danielvishnievskyi.backendapplication.model.dto.game.GameCreateReques
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameResponseDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameSaveRequestDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameStartRequestDTO;
-import com.danielvishnievskyi.backendapplication.services.game.GameService;
+import com.danielvishnievskyi.backendapplication.services.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -18,7 +17,6 @@ import java.util.UUID;
 public class GameController {
   private final GameService gameService;
 
-  @PreAuthorize("isAnonymous()")
   @GetMapping("/{uuid}")
   public ResponseEntity<GameResponseDTO> get(@PathVariable UUID uuid) {
     return ResponseEntity.ok(gameService.getGame(uuid));

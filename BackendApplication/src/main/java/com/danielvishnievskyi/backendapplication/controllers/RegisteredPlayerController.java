@@ -4,7 +4,7 @@ import com.danielvishnievskyi.backendapplication.model.dto.player.RegisteredPlay
 import com.danielvishnievskyi.backendapplication.model.dto.player.RegisteredPlayerResponseDTO;
 import com.danielvishnievskyi.backendapplication.model.entities.RegisteredPlayerEntity;
 import com.danielvishnievskyi.backendapplication.model.mappers.PlayerMapper;
-import com.danielvishnievskyi.backendapplication.services.player.PlayerService;
+import com.danielvishnievskyi.backendapplication.services.PlayerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
