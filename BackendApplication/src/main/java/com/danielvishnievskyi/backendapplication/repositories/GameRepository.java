@@ -3,6 +3,8 @@ package com.danielvishnievskyi.backendapplication.repositories;
 import com.danielvishnievskyi.backendapplication.model.entities.GameEntity;
 import com.danielvishnievskyi.backendapplication.model.entities.PlayerEntity;
 import com.danielvishnievskyi.backendapplication.model.enums.GameState;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +16,8 @@ import java.util.UUID;
 
 @Repository
 public interface GameRepository extends JpaRepository<GameEntity, UUID>, JpaSpecificationExecutor<GameEntity> {
+
+  Page<GameEntity> findByWhitePlayer_UuidOrBlackPlayer_Uuid(UUID whitePlayerUuid, UUID blackPlayerUuid, Pageable pageable);
 
   @Query(value = """
         SELECT g FROM GameEntity g
@@ -28,4 +32,10 @@ public interface GameRepository extends JpaRepository<GameEntity, UUID>, JpaSpec
     where g.gameResult = 'ONGOING' and g.timeFormat != 'unlimited'
   """)
   List<GameEntity> getAllNotUnlimitedOngoingGames();
+
+  @Query(value = """
+    select g from GameEntity g
+    where g.gameResult != 'ONGOING' and g.gameResult != 'CREATED' and g.gameResult != 'ABANDONED'
+  """)
+  List<GameEntity> getAllEndedGames();
 }

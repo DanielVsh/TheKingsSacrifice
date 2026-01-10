@@ -16,6 +16,8 @@ import com.danielvishnievskyi.backendapplication.repositories.GameRepository;
 import com.danielvishnievskyi.backendapplication.repositories.RegisteredPlayerRepository;
 import com.danielvishnievskyi.backendapplication.utils.FenUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,13 @@ public class GameServiceImpl implements GameService {
   private final RegisteredPlayerRepository playerRepository;
   private final GameMapper gameMapper;
   private final SimpMessagingTemplate messagingTemplate;
+
+  @Override
+  public Page<GameResponseDTO> getGames(RegisteredPlayerEntity player, Pageable pageable) {
+    UUID playerUuid = player.getUuid();
+    return gameRepository.findByWhitePlayer_UuidOrBlackPlayer_Uuid(playerUuid, playerUuid, pageable)
+      .map(gameMapper::mapToResponseDTO);
+  }
 
   @Override
   public GameResponseDTO getGame(UUID uuid) {

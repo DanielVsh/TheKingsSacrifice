@@ -4,9 +4,15 @@ import com.danielvishnievskyi.backendapplication.model.dto.game.GameCreateReques
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameResponseDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameSaveRequestDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.game.GameStartRequestDTO;
+import com.danielvishnievskyi.backendapplication.model.entities.RegisteredPlayerEntity;
 import com.danielvishnievskyi.backendapplication.services.GameService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -16,6 +22,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GameController {
   private final GameService gameService;
+
+  @GetMapping("/all")
+  public ResponseEntity<Page<GameResponseDTO>> getAll(
+    @AuthenticationPrincipal RegisteredPlayerEntity player,
+    @PageableDefault(
+      size = 10,
+      sort = "finishedAt",
+      direction = Sort.Direction.DESC
+    ) Pageable pageable
+  ) {
+    return ResponseEntity.ok(gameService.getGames(player, pageable));
+  }
 
   @GetMapping("/{uuid}")
   public ResponseEntity<GameResponseDTO> get(@PathVariable UUID uuid) {
