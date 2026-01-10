@@ -2,6 +2,7 @@ import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {backendIp} from "../../config/backend.ts";
 import {GameCreateRequest, GameResponse, GameSaveRequest, GameStartRequest} from "../../interfaces/IGame.ts";
 import {RootState} from "../store.ts";
+import {Page} from "../../interfaces/IPageable.ts";
 
 export const gameApi = createApi({
   reducerPath: 'gameApi',
@@ -17,6 +18,12 @@ export const gameApi = createApi({
   }),
   tagTypes: ['Game'],
   endpoints: (builder) => ({
+    getGamesData: builder.query<Page<GameResponse>, { page?: number; size?: number; sort?: string }>({
+      query: ({ page = 0, size = 10, sort = 'finishedAt,desc' }) => ({
+        url: '/all',
+        params: { page, size, sort },
+      }),
+    }),
     getGameData: builder.query<GameResponse, string>({
       query: (gameID) => `/${gameID}`,
       providesTags: (result, error, gameID) => [{ type: 'Game', id: gameID }],
@@ -47,6 +54,7 @@ export const gameApi = createApi({
 })
 
 export const {
+  useGetGamesDataQuery,
   useGetGameDataQuery,
   useCreateGameMutation,
   useStartGameMutation,

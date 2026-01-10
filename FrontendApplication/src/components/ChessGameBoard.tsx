@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {Key, useState} from "react";
 import {Piece, PromotionPieceOption, Square} from "react-chessboard/dist/chessboard/types";
 import {Chess, Move} from "chess.js";
 import {Chessboard} from "react-chessboard";
@@ -13,9 +13,11 @@ type SquareMap = { [squareName: string]: SquareOptions };
 
 interface ChessGameBoardProps {
   game: Chess;
+  fen?: string;
   onUserMove: (fen: string) => void;
   boardOrientation: 'white' | 'black'
   canPlayerMove: boolean
+  key?: Key
 }
 export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
   const [moveFrom, setMoveFrom] = useState<Square | null>(null);
@@ -169,10 +171,11 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
 
   return (
     <>
-      <div className={'flex justify-center items-center w-full h-full'}>
+      <div className={'flex justify-center items-center'}>
         <Chessboard id={"GameBoard"}
+                    key={props.key}
                     boardOrientation={props.boardOrientation}
-                    position={props.game.fen()}
+                    position={props.fen ?? props.game.fen()}
                     boardWidth={600}
                     arePremovesAllowed={true}
                     onPieceDrop={onPieceDrop}
