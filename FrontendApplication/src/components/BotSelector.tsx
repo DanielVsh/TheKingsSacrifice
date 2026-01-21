@@ -9,13 +9,13 @@ export interface Bot {
 }
 
 const bots: Bot[] = [
-  { id: 1, name: 'PawnBot', elo: 800, avatar: '/avatars/pawn.png' },
-  { id: 2, name: 'Rookie', elo: 1000, avatar: '/avatars/rookie.png' },
-  { id: 3, name: 'Knightmare', elo: 1200, avatar: '/avatars/knight.png' },
-  { id: 4, name: 'QueenGenius', elo: 1500, avatar: '/avatars/queen.png' },
-  { id: 5, name: 'MasterFish', elo: 2000, avatar: '/avatars/master.png' },
-  { id: 6, name: 'GM Crusher', elo: 2500, avatar: '/avatars/gm.png' },
-  { id: 7, name: 'Stockfish 17', elo: 2800, avatar: '/avatars/stockfish.png' },
+  { id: 1, name: 'PawnBot', elo: 800, avatar: '/images/avatars/pawn.png' },
+  { id: 2, name: 'Rookie', elo: 1000, avatar: '/images/avatars/rookie.png' },
+  { id: 3, name: 'Knightmare', elo: 1200, avatar: '/images/avatars/knight.png' },
+  { id: 4, name: 'QueenGenius', elo: 1500, avatar: '/images/avatars/queen.png' },
+  { id: 5, name: 'MasterFish', elo: 2000, avatar: '/images/avatars/master.png' },
+  { id: 6, name: 'GM Crusher', elo: 2500, avatar: '/images/avatars/gm.png' },
+  { id: 7, name: 'Stockfish 17', elo: 2800, avatar: '/images/avatars/stockfish.png' },
 ];
 
 const getDifficultyColor = (elo: number) => {
@@ -43,6 +43,7 @@ const getDifficultyLabel = (elo: number) => {
   return 'Grandmaster';
 };
 
+// @ts-ignore
 const BotSelector = ({onSelect}) => {
   const [selectedBot, setSelectedBot] = useState<number | null>(null);
   const [hoveredBot, setHoveredBot] = useState<number | null>(null);
@@ -52,8 +53,9 @@ const BotSelector = ({onSelect}) => {
     onSelect(bot);
   };
 
+  // @ts-ignore
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4 md:p-8">
+    <div className="">
       <div className="max-w-screen mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -68,7 +70,7 @@ const BotSelector = ({onSelect}) => {
         {/* Bot Cards Container */}
         <div className="relative">
           <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory">
-            {bots.map((bot, index) => (
+            {bots.map((bot) => (
               <div
                 key={bot.id}
                 className={`flex-none w-72 snap-center transform transition-all duration-300 ${
@@ -85,6 +87,11 @@ const BotSelector = ({onSelect}) => {
                   <div className="relative mb-6">
                     <div className={`w-24 h-24 mx-auto rounded-full bg-gradient-to-r ${getDifficultyColor(bot.elo)} p-1 shadow-lg`}>
                       <div className="w-full h-full rounded-full bg-slate-800 flex items-center justify-center text-3xl font-bold text-white">
+                        {/*<img*/}
+                        {/*  src={bot.avatar}*/}
+                        {/*  alt={bot.name}*/}
+                        {/*  className="w-full h-full object-cover rounded-full"*/}
+                        {/*/>*/}
                         {bot.name.charAt(0)}
                       </div>
                     </div>

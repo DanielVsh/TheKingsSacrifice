@@ -35,7 +35,7 @@ export const AuthRoute = () => {
   return accessToken && checkAuthentication(accessToken)
     ? <Outlet/>
     : <>
-      <div className={`flex flex-col items-center justify-center h-screen`}>
+      <div className={`flex flex-col items-center justify-center `}>
         <p className={'text-3xl'}>You need to log in or register to access this page.</p>
         <AuthenticationModal/>
         <div className={`text-2xl font-bold cursor-pointer hover:drop-shadow-lg pt-3.5`}>

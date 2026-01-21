@@ -1,6 +1,7 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {backendIp} from "../../config/backend.ts";
 import {RootState} from "../store.ts";
+import {RegisteredPlayerRequest, RegisteredPlayerResponse} from "../../interfaces/IPlayer.ts";
 
 export const playerApi = createApi({
   reducerPath: 'playerApi',

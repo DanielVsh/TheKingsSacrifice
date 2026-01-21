@@ -1,45 +1,116 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom"
+
+const navItem =
+  "flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200"
 
 const Sidebar = () => {
   return (
-    <div className="w-36 h-screen bg-neutral-900 text-white top-0 left-0">
-      <h2 className="text-2xl font-bold mb-6">My App</h2>
-      <nav>
-        <ul className="space-y-4 text-sm">
-          <li>
-            <Link to="/play/online/" className="block px-3 py-2 hover:bg-black">
-              Play
-            </Link>
-          </li>
-          <li>
-            <Link to="/dashboard" className="block px-3 py-2 hover:bg-black">
-              Dashboard
-            </Link>
-          </li>
-          <li>
-            <Link to="/play/bot/" className="block px-3 py-2 hover:bg-black">
-              Practice
-            </Link>
-          </li>
-          <li>
-            <Link to="/analysis" className="block px-3 py-2 hover:bg-black">
-              Analysis
-            </Link>
-          </li>
-          <li>
-            <Link to="/profile" className="block px-3 py-2 hover:bg-black">
-              Profile
-            </Link>
-          </li>
-          <li>
-            <Link to="/logout" className="block px-3 py-2 hover:bg-black">
-              Logout
-            </Link>
-          </li>
+    <aside className="fixed left-0 top-0 h-screen w-48  border-r border-slate-800 text-slate-200">
+
+      {/* Logo / Home */}
+      <NavLink
+        to="/"
+        replace
+        className="block px-4 py-6 text-xl font-bold text-center tracking-wide hover:text-cyan-400 transition"
+      >
+        ♟ Chess
+      </NavLink>
+
+      {/* Navigation */}
+      <nav className="px-3">
+        <ul className="space-y-1 text-sm">
+
+          <NavLink
+            to="/play/online"
+            className={({ isActive }) =>
+              `${navItem} ${
+                isActive
+                  ? "bg-cyan-500/10 text-cyan-400 shadow-inner"
+                  : "hover:bg-slate-800/60"
+              }`
+            }
+          >
+            ♞ Play
+          </NavLink>
+
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              `${navItem} ${
+                isActive
+                  ? "bg-cyan-500/10 text-cyan-400"
+                  : "hover:bg-slate-800/60"
+              }`
+            }
+          >
+            📊 Dashboard
+          </NavLink>
+
+          <NavLink
+            to="/play/bot"
+            className={({ isActive }) =>
+              `${navItem} ${
+                isActive
+                  ? "bg-cyan-500/10 text-cyan-400"
+                  : "hover:bg-slate-800/60"
+              }`
+            }
+          >
+            🤖 Practice
+          </NavLink>
+
+          <NavLink
+            to="/puzzle"
+            className={({ isActive }) =>
+              `${navItem} ${
+                isActive
+                  ? "bg-cyan-500/10 text-cyan-400"
+                  : "hover:bg-slate-800/60"
+              }`
+            }
+          >
+            🧩 Puzzles
+          </NavLink>
+
+          <NavLink
+            to="/analysis"
+            className={({ isActive }) =>
+              `${navItem} ${
+                isActive
+                  ? "bg-cyan-500/10 text-cyan-400"
+                  : "hover:bg-slate-800/60"
+              }`
+            }
+          >
+            📈 Analysis
+          </NavLink>
+
+          <NavLink
+            to="/profile"
+            className={({ isActive }) =>
+              `${navItem} ${
+                isActive
+                  ? "bg-cyan-500/10 text-cyan-400"
+                  : "hover:bg-slate-800/60"
+              }`
+            }
+          >
+            👤 Profile
+          </NavLink>
         </ul>
       </nav>
-    </div>
-  );
-};
 
-export default Sidebar;
+      {/* Bottom section */}
+      <div className="absolute bottom-4 w-full px-3">
+        <NavLink
+          to="/logout"
+          className="flex items-center gap-3 px-4 py-2 rounded-lg text-red-400 hover:bg-red-500/10 transition"
+        >
+          ⏻ Logout
+        </NavLink>
+      </div>
+    </aside>
+  )
+}
+
+export default Sidebar

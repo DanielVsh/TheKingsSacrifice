@@ -6,6 +6,7 @@ import { gameApi } from "./api/GameApi";
 import { authApi } from "./api/AuthApi";
 import { playerApi } from "./api/PlayerApi";
 import playerReducer from "./reducers/PlayerReducer";
+import {puzzleApi} from "./api/PuzzleApi.ts";
 
 
 const persistConfig = {
@@ -14,7 +15,8 @@ const persistConfig = {
   blacklist: [
     gameApi.reducerPath,
     authApi.reducerPath,
-    playerApi.reducerPath
+    playerApi.reducerPath,
+    puzzleApi.reducerPath
   ]
 };
 
@@ -22,6 +24,7 @@ const rootReducer = combineReducers({
   [gameApi.reducerPath]: gameApi.reducer,
   [authApi.reducerPath]: authApi.reducer,
   [playerApi.reducerPath]: playerApi.reducer,
+  [puzzleApi.reducerPath]: puzzleApi.reducer,
   playerReducer,
 });
 
@@ -38,6 +41,7 @@ export const store = configureStore({
       gameApi.middleware,
       authApi.middleware,
       playerApi.middleware,
+      puzzleApi.middleware,
     ),
 });
 

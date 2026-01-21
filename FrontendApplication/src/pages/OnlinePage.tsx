@@ -3,18 +3,18 @@ import {useCreateGameMutation} from "../app/state/api/GameApi.ts";
 import {useSelector} from "react-redux";
 import {RootState} from "../app/state/store.ts";
 import {useEffect, useState} from "react";
-import {GameResponse, MatchmakingQueueSize, PlayerMatchRequest} from "../app/interfaces/IGame.ts";
+import {GameMode, GameResponse, MatchmakingQueueSize, PlayerMatchRequest} from "../app/interfaces/IGame.ts";
 import TimeModes from "../components/TimeModes.tsx";
 import {useWebSocket} from "../hooks/useWebSocket.ts";
 import SearchingModal from "../modals/SearchingModal.tsx";
+import {getRatingByGameMode} from "../app/interfaces/IPlayer.ts";
 
 export const OnlinePage = () => {
 
-  const [isRating, setIsRating] = useState<boolean>(true)
+  const [selectedGameMode, setSelectedGameMode] = useState<GameMode>(GameMode.BLITZ)
   const user = useSelector((state: RootState) => state.playerReducer.player)!!
   const [createGame] = useCreateGameMutation()
   const navigate = useNavigate()
-  const [timeMode, setTimeMode] = useState('time-range')
   const [minutes, setMinutes] = useState(0)
   const [seconds, setSeconds] = useState(0)
 
@@ -85,7 +85,8 @@ export const OnlinePage = () => {
     createGame({
       whitePlayer: playerColor === 'w' ? user.uuid : null,
       blackPlayer: playerColor === 'b' ? user.uuid : null,
-      timeFormat: timeMode === 'time-range' ? `${minutes * 60}+${seconds}` : 'unlimited'
+      timeFormat: `${minutes * 60}+${seconds}`,
+      gameMode: GameMode.NON_RATING
     })
       .then(value => {
         if ('data' in value) {
@@ -105,95 +106,118 @@ export const OnlinePage = () => {
     setSeconds(newSeconds >= 0 ? newSeconds : 0);
   };
 
-  const handleModeChange = (event: { target: { value: string; }; }) => {
-    setTimeMode(event.target.value);
-  };
-
-  const commonButtonClassName = `${minutes === 0 && seconds === 0 && timeMode == 'time-range'
+  const commonButtonClassName = `${minutes === 0 && seconds === 0
     ? 'pointer-events-none opacity-50 cursor-not-allowed '
     : 'cursor-pointer'}`;
 
+
   return (
     <>
-      <div className="h-screen overflow-hidden flex flex-col items-center justify-center bg-black text-white">
-        <form className="flex flex-col items-center mb-6">
-          <label htmlFor="modes" className="block mb-2 text-lg font-bold">
-            Select game mode
-          </label>
-          <select
-            id="modes"
-            className="bg-zinc-900 w-[50vw] text-lg rounded-lg block p-2.5 cursor-pointer outline-none"
-            onChange={(e) => setIsRating(e.target.value === "rating-game")}
-          >
-            <option value="rating-game">Rating Game</option>
-            <option value="friendly-game">Friendly Game</option>
-          </select>
-        </form>
+      <div className=" overflow-hidden flex flex-col items-center justify-center text-white">
+        <div>
+          <SearchingModal queueSize={queueSize} isOpen={isSearchingRatingGame} onCancel={() => cancelSearch()}/>
+          <TimeModes onActiveCategoryChange={category => setSelectedGameMode(category)}
+                     onSelect={(mode) => {
+                       setSearchRatingGame(true)
+                       setCurrentMatchRequest({
+                         timeFormat: `${parseInt(mode.name.split("+")[0], 10) * 60}+${mode.name.split("+")[1]}`,
+                         rating: getRatingByGameMode(user, mode.category),
+                         playerUUID: user!.uuid,
+                         gameMode: mode.category
+                       })
+                     }}/>
+          {selectedGameMode === GameMode.NON_RATING ?
+            <>
+              {/* Time configuration card */}
+              <div className="w-full max-w-2xl bg-zinc-900 rounded-2xl p-6 shadow-xl flex flex-col items-center gap-6">
 
-        {isRating
-          ?
-          <>
-            <SearchingModal queueSize={queueSize} isOpen={isSearchingRatingGame} onCancel={() => cancelSearch()}/>
-            <TimeModes onSelect={(mode) => {
-              setSearchRatingGame(true)
-              setCurrentMatchRequest({
-                timeFormat: `${parseInt(mode.name.split("+")[0], 10) * 60}+${mode.name.split("+")[1]}`,
-                rating: user!.rating,
-                playerUUID: user!.uuid
-              })
-            }}/>
-          </>
-          :
-          <>
+                {/* Mode select */}
+                <div className="w-full flex flex-col items-center gap-2">
+                  <label
+                    htmlFor="modes"
+                    className="text-sm uppercase tracking-wide text-zinc-400 font-semibold"
+                  >
+                    Time Mode
+                  </label>
+                </div>
 
-            <div className={`flex flex-col items-center`}>
-              <form className="flex flex-col items-center">
-                <label htmlFor="modes" className="block mb-2 text-lg font-bold ">
-                  Select time mode
-                </label>
-                <select
-                  id="modes"
-                  className={`bg-black w-[50vw] text-lg rounded-lg block p-2.5 cursor-pointer outline-none`}
-                  value={timeMode}
-                  onChange={handleModeChange}
-                >
-                  <option value="unlimited">Unlimited</option>
-                  <option value="time-range">Time range</option>
-                </select>
-              </form>
-              {timeMode === 'time-range' &&
-                  <div className={`flex flex-col items-center`}>
-                      <div>
-                          <a className={`flex`}>Minutes per side: {minutes}</a>
-                          <input type="range" min="0" max="180" value={minutes} step={minutes < 15 ? 1 : 5}
-                                 onChange={handleMinutesChange}
-                                 className={`w-[60vw] accent-white cursor-pointer py-2`}/>
+                {/* Sliders */}
+
+                  <div className="w-full flex flex-col gap-6">
+
+                    {/* Minutes */}
+                    <div className="flex flex-col gap-2">
+                      <div className="flex justify-between text-sm text-zinc-400">
+                        <span>Minutes per side</span>
+                        <span className="font-semibold text-white">{minutes} min</span>
                       </div>
-                      <div>
-                          <a className={`flex`}>Seconds per move: {seconds}</a>
-                          <input type="range" min="0" max="180" value={seconds} step={seconds < 15 ? 1 : 5}
-                                 onChange={handleSecondsChange}
-                                 className={`w-[60vw] accent-white cursor-pointer`}/>
+
+                      <input
+                        type="range"
+                        min="0"
+                        max="180"
+                        value={minutes}
+                        step={minutes < 15 ? 1 : 5}
+                        onChange={handleMinutesChange}
+                        className="w-full accent-white cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Seconds */}
+                    <div className="flex flex-col gap-2">
+                      <div className="flex justify-between text-sm text-zinc-400">
+                        <span>Increment per move</span>
+                        <span className="font-semibold text-white">{seconds} sec</span>
                       </div>
-                      <div className={`flex flex-col items-center pt-4 text-6xl font-bold`}>
-                        {minutes}m+{seconds}s
-                      </div>
+
+                      <input
+                        type="range"
+                        min="0"
+                        max="180"
+                        value={seconds}
+                        step={seconds < 15 ? 1 : 5}
+                        onChange={handleSecondsChange}
+                        className="w-full accent-white cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Time preview */}
+                    <div className="text-center text-5xl font-extrabold tracking-tight pt-2">
+                      {minutes}m<span className="text-zinc-400">+</span>{seconds}s
+                    </div>
                   </div>
-              }
-            </div>
-            <div className={`flex flex-wrap justify-center gap-4 text-4xl font-bold pt-12`}>
-              <div className={commonButtonClassName}
-                   onClick={() => handleCreateGame("w")}>White
+
               </div>
-              <div className={commonButtonClassName}
-                   onClick={() => handleCreateGame("r")}>Random
+
+              {/* Color buttons */}
+              <div className="flex flex-wrap justify-center gap-6 pt-10">
+                {[
+                  {key: "w", label: "White"},
+                  {key: "r", label: "Random"},
+                  {key: "b", label: "Black"},
+                ].map(({key, label}) => (
+                  <button
+                    key={key}
+                    onClick={() => handleCreateGame(key)}
+                    className={`
+          ${commonButtonClassName}
+          px-10 py-5 rounded-2xl
+          text-3xl font-bold
+          bg-zinc-800 hover:bg-zinc-700
+          active:scale-95 transition-all
+          shadow-lg
+        `}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
-              <div className={commonButtonClassName}
-                   onClick={() => handleCreateGame("b")}>Black
-              </div>
-            </div>
-          </>
-        }
+            </>
+
+            :
+            <></>
+          }
+        </div>
       </div>
     </>
   );

@@ -33,7 +33,7 @@ const LogoutPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-urban-dark text-white">
+    <div className="flex items-center justify-center  text-white">
         <div className="bg-urban-black p-6 rounded-lg shadow-lg text-center">
           <h2 className="text-xl mb-4">Are you sure you want to log out?</h2>
           <div className="flex justify-center gap-4">

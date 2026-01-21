@@ -13,6 +13,7 @@ import {motion} from "framer-motion";
 import {GameResult} from "../app/enums/GameResult.ts";
 import {SoundService} from "../services/SoundService.ts";
 import {getDurationString} from "../services/DateTimeService.ts";
+import {MoveList} from "./MoveList.tsx";
 
 interface PlayerTime {
   whitePlayerTime: number;
@@ -168,20 +169,6 @@ export const PlayComponent: React.FC<PlayComponentProps> = (props) => {
     return `${minutes}:${formattedSeconds}${formattedTenths}`;
   }
 
-  function getBeautyMoves(): React.JSX.Element[] {
-    const moves = game.history() ?? [];
-    const groupedMoves = [];
-    for (let i = 0; i < moves.length; i += 2) {
-      const white = moves[i];
-      const black = moves[i + 1] ?? '';
-      groupedMoves.push({number: Math.floor(i / 2) + 1, white, black});
-    }
-    return groupedMoves.map(({number, white, black}) => (
-      <li key={number}>
-        {number}. {white} {black}
-      </li>
-    ));
-  }
 
   return (
     <>
@@ -215,7 +202,7 @@ export const PlayComponent: React.FC<PlayComponentProps> = (props) => {
             </div>
           </motion.div>
         </div>)
-        : (<div className="flex h-screen w-full bg-black text-white font-sans">
+        : (<div className="flex  w-full text-white font-sans">
           {/* Center content */}
           <main className="flex-1 flex flex-col items-center justify-center px-4">
             {/* Top Player Info */}
@@ -252,7 +239,7 @@ export const PlayComponent: React.FC<PlayComponentProps> = (props) => {
               <h3 className="text-lg font-bold mb-2">Moves</h3>
               <div className="border border-white/10 rounded p-2 h-48 overflow-y-auto bg-black">
                 <ul className="text-sm space-y-1 text-gray-200">
-                  {getBeautyMoves()}
+                  //moves
                 </ul>
               </div>
             </div>

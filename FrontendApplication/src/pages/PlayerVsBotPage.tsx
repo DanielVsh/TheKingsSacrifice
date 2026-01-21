@@ -70,7 +70,7 @@ export const PlayerVsBotPage: React.FC<PlayerVsBotProps> = (props) => {
   }, [game, makeStockfishMove]);
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-slate-900 text-white">
+    <div className="w-full flex flex-col items-center justify-center text-white">
       <div className="mb-4 w-full max-w-md">
         <label className="block mb-2">
           {props.bot.name} ELO: {props.bot.elo}

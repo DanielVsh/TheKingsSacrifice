@@ -3,6 +3,7 @@ import {Piece, PromotionPieceOption, Square} from "react-chessboard/dist/chessbo
 import {Chess, Move} from "chess.js";
 import {Chessboard} from "react-chessboard";
 import {SoundService} from "../services/SoundService.ts";
+import {useBoardSize} from "../hooks/useBoardSize.ts";
 
 type SquareOptions = {
   background: string;
@@ -169,6 +170,7 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
     return true;
   }
 
+  const boardWidth = useBoardSize();
   return (
     <>
       <div className={'flex justify-center items-center'}>
@@ -176,7 +178,7 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
                     key={props.key}
                     boardOrientation={props.boardOrientation}
                     position={props.fen ?? props.game.fen()}
-                    boardWidth={600}
+                    boardWidth={boardWidth}
                     arePremovesAllowed={true}
                     onPieceDrop={onPieceDrop}
                     onPieceDragBegin={onPieceDragBegin}

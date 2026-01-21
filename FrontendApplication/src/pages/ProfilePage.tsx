@@ -1,46 +1,54 @@
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import {useGetPlayerDataQuery} from "../app/state/api/PlayerApi.ts";
+import {setPlayer} from "../app/state/reducers/PlayerReducer.ts";
 import {LoadingElement} from "../components/LoadingElement.tsx";
-import {useGetGamesDataQuery} from "../app/state/api/GameApi.ts";
-import {Link} from "react-router-dom";
 
 export const ProfilePage = () => {
+  const dispatch = useDispatch();
+  const { data, error, isLoading } = useGetPlayerDataQuery();
 
-  const {data, error, isLoading} = useGetGamesDataQuery({
-    page: 0,
-    size: 10,
-    sort: 'finishedAt,desc',
-  });
+  useEffect(() => {
+    if (data) {
+      dispatch(setPlayer(data));
+    }
+  }, [data, dispatch]);
 
-  if (isLoading) return <LoadingElement/>;
-  if (error) return <div>Error loading data.</div>;
-
+  if (isLoading) return <LoadingElement />;
+  if (error) return <div className="text-red-500 text-center mt-6">Error loading data.</div>;
 
   return (
-    <>
-      <div>
-        <h2>Games</h2>
+    <div className="w-full flex justify-center px-4 py-6">
+      <div className="w-full max-w-3xl space-y-6">
 
-        {data?.content.map(game => (
-          <div key={game.uuid} className={`flex items-center gap-2`}>
-            <div className={`${game.whitePlayer?.uuid === game.winner?.uuid ? 'text-green-600' : 'text-red-600'}`}>
-              {game.whitePlayer?.nickname}
-            </div>
-            <span>vs</span>
-            <div className={`${game.blackPlayer?.uuid === game.winner?.uuid ? 'text-green-600' : 'text-red-600'}`}>
-              {game.blackPlayer?.nickname}
-            </div>
-            <span>– {game.gameResult}</span>
-            <Link to={`/game/${game.uuid}`} className={`flex items-center gap-2`}>View Game</Link>
+        {/* Profile Header */}
+        <div className="bg-zinc-900 rounded-2xl p-6 shadow-md">
+          <h1 className="text-2xl font-bold mb-1">{data!.nickname}</h1>
+          <p className="text-sm text-zinc-400">{data!.email}</p>
+        </div>
+
+        {/* Ratings */}
+        <div className="bg-zinc-900 rounded-2xl p-6 shadow-md">
+          <h2 className="text-lg font-semibold mb-4">Ratings</h2>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <RatingCard label="Bullet" value={data!.bulletRating} />
+            <RatingCard label="Blitz" value={data!.blitzRating} />
+            <RatingCard label="Rapid" value={data!.rapidRating} />
+            <RatingCard label="Classical" value={data!.classicalRating} />
           </div>
-        ))}
-
-        <div className="flex gap-2 mt-4">
-          <button disabled={data?.first}>Prev</button>
-          <span>
-        Page {data?.number! + 1} / {data?.totalPages}
-      </span>
-          <button disabled={data?.last}>Next</button>
         </div>
       </div>
-    </>
-  )
+    </div>
+  );
+};
+
+
+function RatingCard({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="bg-zinc-800 rounded-xl p-4 text-center border border-zinc-700">
+      <div className="text-sm text-zinc-400">{label}</div>
+      <div className="text-xl font-bold">{value}</div>
+    </div>
+  );
 }
