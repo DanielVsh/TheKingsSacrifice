@@ -7,9 +7,9 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class GameEloRatingUtils {
 
-  public void calculateNewRatings(GameEntity gameEntity) {
-    int whiteRating = gameEntity.getWhitePlayer().getRating();
-    int blackRating = gameEntity.getBlackPlayer().getRating();
+  public ResultRating calculateNewRatings(GameEntity gameEntity) {
+    int whiteRating = gameEntity.getWhitePlayer().getRatingDueToMode(gameEntity.getGameMode());
+    int blackRating = gameEntity.getBlackPlayer().getRatingDueToMode(gameEntity.getGameMode());
 
     double expectedWhite = expectedScore(whiteRating, blackRating);
     double expectedBlack = expectedScore(blackRating, whiteRating);
@@ -32,11 +32,22 @@ public class GameEloRatingUtils {
     int newWhite = (int) Math.round(whiteRating + k * (whiteScore - expectedWhite));
     int newBlack = (int) Math.round(blackRating + k * (blackScore - expectedBlack));
 
-    gameEntity.getWhitePlayer().setRating(newWhite);
-    gameEntity.getBlackPlayer().setRating(newBlack);
+    return new ResultRating(
+      newWhite,
+      newWhite - whiteRating,
+      newBlack,
+      newBlack - blackRating
+    );
   }
 
   private double expectedScore(int ratingA, int ratingB) {
     return 1.0 / (1.0 + Math.pow(10, (ratingB - ratingA) / 400.0));
   }
+
+  public record ResultRating(
+    int newWhiteRating,
+    int whiteRatingDelta,
+    int newBlackRating,
+    int blackRatingDelta
+  ) {}
 }

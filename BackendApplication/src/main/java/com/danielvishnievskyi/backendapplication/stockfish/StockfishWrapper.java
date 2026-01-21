@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 
-@Component
+//@Component
 public class StockfishWrapper implements AutoCloseable {
   private Process stockfishProcess;
   private BufferedReader reader;

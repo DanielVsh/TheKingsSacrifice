@@ -38,7 +38,7 @@ public class GameMatchmakingWebsocket {
       UUID whitePlayerUUID = match.white().playerUUID();
       UUID blackPlayerUUID = match.black().playerUUID();
       var createdGame = gameService.createGame(new GameCreateRequestDTO(
-        whitePlayerUUID, blackPlayerUUID, request.timeFormat()
+        whitePlayerUUID, blackPlayerUUID, request.timeFormat(), request.gameMode()
       ));
 
       var startedGame = gameService.startGame(

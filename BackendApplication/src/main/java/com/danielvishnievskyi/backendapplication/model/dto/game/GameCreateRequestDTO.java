@@ -1,5 +1,6 @@
 package com.danielvishnievskyi.backendapplication.model.dto.game;
 
+import com.danielvishnievskyi.backendapplication.model.enums.GameMode;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -17,4 +18,5 @@ public class GameCreateRequestDTO {
   @NotBlank
   @Pattern(regexp = "\\d+\\+\\d+|unlimited", message = "Invalid time format")
   private String timeFormat;
+  private GameMode gameMode;
 }

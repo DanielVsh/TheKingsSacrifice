@@ -1,5 +1,6 @@
 package com.danielvishnievskyi.backendapplication.model.entities;
 
+import com.danielvishnievskyi.backendapplication.model.enums.GameMode;
 import com.danielvishnievskyi.backendapplication.model.enums.GameState;
 import com.danielvishnievskyi.backendapplication.utils.GameEloRatingUtils;
 import jakarta.persistence.*;
@@ -58,6 +59,16 @@ public class GameEntity {
 
   private String pgn;
 
+  @Column(name = "white_rating_delta")
+  private Integer whiteRatingDelta;
+
+  @Column(name = "black_rating_delta")
+  private Integer blackRatingDelta;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "game_mode", nullable = false)
+  private GameMode gameMode;
+
   @PrePersist
   public void prePersist() {
     this.createdAt = LocalDateTime.now();
@@ -87,13 +98,19 @@ public class GameEntity {
       this.finishedAt = LocalDateTime.now();
       this.gameResult = gameResult;
 
-      updatePlayersRating();
+      if (gameMode != GameMode.NON_RATING) {
+        updatePlayersRating();
+      }
     }
     return this;
   }
 
   private void updatePlayersRating() {
-    GameEloRatingUtils.calculateNewRatings(this);
+    GameEloRatingUtils.ResultRating resultRating = GameEloRatingUtils.calculateNewRatings(this);
+    this.whiteRatingDelta = resultRating.whiteRatingDelta();
+    this.blackRatingDelta = resultRating.blackRatingDelta();
+    this.getWhitePlayer().setRatingDueToMode(resultRating.newWhiteRating(), gameMode);
+    this.getBlackPlayer().setRatingDueToMode(resultRating.newBlackRating(), gameMode);
   }
 
 }

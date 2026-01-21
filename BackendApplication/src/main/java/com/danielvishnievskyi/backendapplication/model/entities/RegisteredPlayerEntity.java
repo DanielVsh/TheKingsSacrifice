@@ -1,5 +1,6 @@
 package com.danielvishnievskyi.backendapplication.model.entities;
 
+import com.danielvishnievskyi.backendapplication.model.enums.GameMode;
 import com.danielvishnievskyi.backendapplication.model.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -31,11 +32,37 @@ public class RegisteredPlayerEntity extends PlayerEntity implements UserDetails 
   @Column(nullable = false)
   private String password;
 
-  private int rating;
+  @Setter(AccessLevel.NONE)
+  private int bulletRating;
+  @Setter(AccessLevel.NONE)
+  private int blitzRating;
+  @Setter(AccessLevel.NONE)
+  private int rapidRating;
+  @Setter(AccessLevel.NONE)
+  private int classicalRating;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "roles", nullable = false)
   private List<Role> roles;
+
+  public int getRatingDueToMode(GameMode mode) {
+    return switch (mode) {
+      case BULLET -> this.bulletRating;
+      case BLITZ -> this.blitzRating;
+      case RAPID -> this.rapidRating;
+      case CLASSICAL -> this.classicalRating;
+      default -> throw new IllegalArgumentException();
+    };
+  }
+
+  public void setRatingDueToMode(int rating, GameMode mode) {
+    switch (mode) {
+      case BULLET -> this.bulletRating = rating;
+      case BLITZ -> this.blitzRating = rating;
+      case RAPID -> this.rapidRating = rating;
+      case CLASSICAL -> this.classicalRating = rating;
+    };
+  }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {

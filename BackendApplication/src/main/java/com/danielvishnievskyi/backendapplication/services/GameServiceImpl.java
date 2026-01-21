@@ -94,6 +94,7 @@ public class GameServiceImpl implements GameService {
       .blackPlayer(blackPlayer.orElse(null))
       .gameResult(GameState.CREATED)
       .timeFormat(gameCreateRequestDTO.getTimeFormat())
+      .gameMode(gameCreateRequestDTO.getGameMode())
       .build();
 
     if (!gameCreateRequestDTO.getTimeFormat().equals(TimeFormat.UNLIMITED_TIME_FORMAT)) {

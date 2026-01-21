@@ -52,6 +52,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       requestDto.getEmail(),
       passwordEncoder.encode(requestDto.getPassword()),
       requestDto.getRating(),
+      requestDto.getRating(),
+      requestDto.getRating(),
+      requestDto.getRating(),
       List.of(PLAYER)
     );
     RegisteredPlayerEntity saved = playerRepo.save(registeredPlayer);

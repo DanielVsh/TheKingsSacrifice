@@ -1,9 +1,6 @@
 package com.danielvishnievskyi.backendapplication.model.dto.player;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -15,5 +12,8 @@ public class RegisteredPlayerResponseDTO {
   private UUID uuid;
   private String nickname;
   private String email;
-  private int rating;
+  private int bulletRating;
+  private int blitzRating;
+  private int rapidRating;
+  private int classicalRating;
 }

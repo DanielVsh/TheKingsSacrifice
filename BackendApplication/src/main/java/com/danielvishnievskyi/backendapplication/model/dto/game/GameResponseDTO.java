@@ -3,6 +3,7 @@ package com.danielvishnievskyi.backendapplication.model.dto.game;
 import com.danielvishnievskyi.backendapplication.model.TimeFormat;
 import com.danielvishnievskyi.backendapplication.model.dto.player.RegisteredPlayerResponseDTO;
 import com.danielvishnievskyi.backendapplication.model.entities.RegisteredPlayerEntity;
+import com.danielvishnievskyi.backendapplication.model.enums.GameMode;
 import com.danielvishnievskyi.backendapplication.model.enums.GameState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,4 +27,7 @@ public class GameResponseDTO {
   private LocalDateTime finishedAt;
   private TimeFormat timeFormat;
   private GameTimeResponseDTO playersTime;
+  private int whiteRatingDelta;
+  private int blackRatingDelta;
+  private GameMode gameMode;
 }
