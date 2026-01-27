@@ -6,6 +6,9 @@ import {EvalBar} from "../components/EvalBar"
 import {MoveList} from "../components/MoveList"
 import {ReviewPanel} from "../components/ReviewPanel"
 import { useBoardSize} from "../hooks/useBoardSize.ts";
+import {Arrow, Square} from "react-chessboard/dist/chessboard/types";
+import {BestLinePreview} from "../components/BestLinePreview.tsx";
+
 
 interface AnalysisPageProps {
   fens?: string[]
@@ -16,6 +19,8 @@ export const AnalysisPage: React.FC<AnalysisPageProps> = ({ fens, boardOrientati
   const fullGameRef = useRef(new Chess()) // stores full original game
   const boardRef = useRef(new Chess()) // current board for display & edits
   const { analyze, result } = useStockfish()
+
+  const [bestMoveArrows, setBestMoveArrows] = useState<Arrow[]>([])
 
   const [moves, setMoves] = useState<{ san: string; fen: string }[]>([])
   const [reviews, setReviews] = useState<any[]>([])
@@ -31,6 +36,8 @@ export const AnalysisPage: React.FC<AnalysisPageProps> = ({ fens, boardOrientati
       fens.forEach((fen, i) => {
         // Just store the FEN as a "move"
         history.push({ san: `Move ${i + 1}`, fen })
+        fullGameRef.current.load(fen)
+        boardRef.current.load(fen)
       })
     }
 
@@ -38,17 +45,27 @@ export const AnalysisPage: React.FC<AnalysisPageProps> = ({ fens, boardOrientati
     setCurrentMoveIndex(history.length - 1) // start at last move
   }, [fens])
 
+  useEffect(() => {
+    if (!result?.pv || result.pv.length === 0) {
+      setBestMoveArrows([])
+      return
+    }
 
-  // Update board whenever currentMoveIndex changes
-  // useEffect(() => {
-  //   boardRef.current.reset()
-  //   if (currentMoveIndex >= 0) {
-  //     const fen = moves[currentMoveIndex].fen
-  //     boardRef.current.load(fen)
-  //   }
-  //
-  //   analyze(boardRef.current.fen())
-  // }, [currentMoveIndex, moves, analyze])
+    const firstPvMove = result.pv[0]
+
+    if (!firstPvMove) {
+      setBestMoveArrows([])
+      return
+    }
+
+    setBestMoveArrows([
+      [
+        firstPvMove.slice(0, 2) as Square,
+        firstPvMove.slice(2, 4)as Square,
+        "rgba(0,255,0,0.85)"]
+    ])
+  }, [result, currentMoveIndex])
+
 
 
   // Handle user move at any point
@@ -89,7 +106,7 @@ export const AnalysisPage: React.FC<AnalysisPageProps> = ({ fens, boardOrientati
   }
 
   const goToPreviousMove = () => {
-    setCurrentMoveIndex(idx => Math.max(idx - 1, -1))
+    setCurrentMoveIndex(idx => Math.max(idx - 1, 0))
   }
 
   const goToNextMove = () => {
@@ -108,6 +125,7 @@ export const AnalysisPage: React.FC<AnalysisPageProps> = ({ fens, boardOrientati
             boardOrientation={boardOrientation}
             canPlayerMove={true}
             onUserMove={onUserMove}
+            customArrows={bestMoveArrows}
           />
 
           <div className="flex gap-2 mt-2">
@@ -131,9 +149,7 @@ export const AnalysisPage: React.FC<AnalysisPageProps> = ({ fens, boardOrientati
           <ReviewPanel reviews={reviews} />
 
           {result?.pv && (
-            <div className="text-sm">
-              <b>Best line:</b> {result.pv.join(" ")}
-            </div>
+            <BestLinePreview pv={result.pv} boardOrientation={boardOrientation} initialFen={moves[currentMoveIndex]?.fen} />
           )}
         </div>
       </div>

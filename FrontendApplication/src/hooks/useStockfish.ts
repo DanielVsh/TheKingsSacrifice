@@ -28,7 +28,7 @@ export function useStockfish() {
       setResult({
         depth,
         eval: mate ? "MATE" : Number(cp) / 100,
-        pv: pv.split(" ")
+        pv: pv.split(" ").slice(0, 7),
       })
     }
 

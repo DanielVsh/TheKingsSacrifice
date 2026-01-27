@@ -13,7 +13,6 @@ import {motion} from "framer-motion";
 import {GameResult} from "../app/enums/GameResult.ts";
 import {SoundService} from "../services/SoundService.ts";
 import {getDurationString} from "../services/DateTimeService.ts";
-import {MoveList} from "./MoveList.tsx";
 
 interface PlayerTime {
   whitePlayerTime: number;

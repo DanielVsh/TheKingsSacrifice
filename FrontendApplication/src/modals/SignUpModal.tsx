@@ -12,6 +12,7 @@ import {setTokens} from "../app/state/reducers/PlayerReducer.ts";
 import {Dispatch} from "@reduxjs/toolkit";
 import {NavigateFunction, useNavigate} from "react-router-dom";
 import { MutationActionCreatorResult, MutationDefinition, BaseQueryFn, FetchArgs, FetchBaseQueryError, FetchBaseQueryMeta } from "@reduxjs/toolkit/query";
+import {RegisteredPlayerRequest} from "../app/interfaces/IPlayer.ts";
 
 const passwordSchema = z.string()
   .min(8, "Must be at least 8 characters")

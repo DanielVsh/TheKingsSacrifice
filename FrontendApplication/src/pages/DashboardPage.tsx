@@ -58,8 +58,10 @@ export const DashboardPage = () => {
           <tbody>
           {gamesData?.content.map((game: GameResponse) => {
             const isPlayerWhite = game.whitePlayer?.uuid === playerData?.uuid
-            // const isWhiteWin = game.whitePlayer?.uuid === game.winner?.uuid
-            const isPlayerWon = game.winner?.uuid === playerData?.uuid
+            const isWhiteWon =
+              game.winner && game.winner.uuid === game.whitePlayer?.uuid
+            const isBlackWon =
+              game.winner && game.winner.uuid === game.blackPlayer?.uuid
 
             const movesCount = Math.floor(game.history.length / 2)
 
@@ -78,12 +80,14 @@ export const DashboardPage = () => {
                 key={game.uuid}
                 className="border-t border-slate-800 hover:bg-slate-800/40 transition"
               >
-                <td className={`px-4 py-2 font-medium`}>
-                  {game.winner && isPlayerWon ? "👑" : ""}{isPlayerWhite ? "You" : game.whitePlayer?.nickname}
+                <td className="px-4 py-2 font-medium">
+                  {isPlayerWhite ? "You" : game.whitePlayer?.nickname}
+                  {isWhiteWon ? " 👑" : ""}
                 </td>
 
-                <td className={`px-4 py-2 font-medium`}>
-                  {game.winner && !isPlayerWon ? "👑" : ""}{!isPlayerWhite ? "You" : game.blackPlayer?.nickname}
+                <td className="px-4 py-2 font-medium">
+                  {!isPlayerWhite ? "You" : game.blackPlayer?.nickname}
+                  {isBlackWon ? " 👑" : ""}
                 </td>
 
                 <td className="px-4 py-2 text-center">
