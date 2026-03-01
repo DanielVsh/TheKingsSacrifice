@@ -149,7 +149,11 @@ export const AnalysisPage: React.FC<AnalysisPageProps> = ({ fens, boardOrientati
           <ReviewPanel reviews={reviews} />
 
           {result?.pv && (
-            <BestLinePreview pv={result.pv} boardOrientation={boardOrientation} initialFen={moves[currentMoveIndex]?.fen} />
+            <BestLinePreview
+              pv={result.pv}
+              boardOrientation={boardOrientation}
+              initialFen={moves[currentMoveIndex]?.fen}
+            />
           )}
         </div>
       </div>

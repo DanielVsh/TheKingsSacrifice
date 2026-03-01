@@ -1,5 +1,5 @@
 import React, {Key, useState} from "react";
-import {Arrow, Piece, PromotionPieceOption, Square} from "react-chessboard/dist/chessboard/types";
+import {Arrow, CustomSquareStyles, Piece, PromotionPieceOption, Square} from "react-chessboard/dist/chessboard/types";
 import {Chess, Move} from "chess.js";
 import {Chessboard} from "react-chessboard";
 import {SoundService} from "../services/SoundService.ts";
@@ -20,7 +20,9 @@ interface ChessGameBoardProps {
   canPlayerMove: boolean
   key?: Key
   customArrows?: Arrow[]
+  customSquareStyles?: CustomSquareStyles
 }
+
 export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
   const [moveFrom, setMoveFrom] = useState<Square | null>(null);
   const [moveTo, setMoveTo] = useState<Square | null>(null);
@@ -190,10 +192,13 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
                       borderRadius: "4px",
                       boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
                     }}
-                    customSquareStyles={{
-                      ...optionSquares,
-                      ...rightClickedSquares,
-                    }}
+                    customSquareStyles={
+                      {
+                        ...rightClickedSquares,
+                        ...props.customSquareStyles,
+                        ...optionSquares,
+                      }
+                    }
                     promotionToSquare={moveTo}
                     showPromotionDialog={showPromotionDialog}
                     customDarkSquareStyle={{

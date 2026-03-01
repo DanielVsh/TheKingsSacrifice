@@ -74,7 +74,7 @@ export const PuzzlePage = () => {
               to={`/puzzle/${puzzle.id}`}
               className="rounded-md bg-blue-600/80 px-4 py-2 text-sm font-medium hover:bg-blue-600 transition"
             >
-              Solve →
+              Solve
             </Link>
           </div>
         ))}
