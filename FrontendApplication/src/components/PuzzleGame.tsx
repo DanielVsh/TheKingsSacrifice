@@ -5,84 +5,87 @@ import { PuzzleResponse } from "../app/interfaces/IPuzzle";
 
 interface Props {
   puzzle: PuzzleResponse;
+  onSkip?: () => void;
 }
 
-export const PuzzleGame: React.FC<Props> = ({ puzzle }) => {
+export const PuzzleGame: React.FC<Props> = ({ puzzle, onSkip }) => {
   const [game, setGame] = useState(new Chess());
   const [status, setStatus] = useState<"playing" | "won" | "lost">("playing");
   const [currentMoveIndex, setCurrentMoveIndex] = useState(0);
-  const [lastFen, setLastFen] = useState(puzzle.fen);
-  const [highlightSquares, setHighlightSquares] = useState<Record<string, any>>({});
+  const [highlightSquares, setHighlightSquares] = useState<Record<string, any>>(
+    {}
+  );
 
   const chessRef = useRef(new Chess());
 
   useEffect(() => {
     const chess = new Chess();
     chess.load(puzzle.fen);
+
     chessRef.current = chess;
     setGame(chess);
-    setLastFen(puzzle.fen);
     setStatus("playing");
     setCurrentMoveIndex(0);
     setHighlightSquares({});
   }, [puzzle]);
 
-  const applyMoveHighlight = (move: { from: string; to: string }) => {
+  const applyMoveHighlight = (from: string, to: string) => {
     setHighlightSquares({
-      [move.from]: { backgroundColor: "rgba(246,220,162,0.8)" },
-      [move.to]: { backgroundColor: "rgba(255,165,0,0.8)" },
+      [from]: { backgroundColor: "rgba(180,180,180,0.25)" },
+      [to]: { backgroundColor: "rgba(120,120,120,0.35)" },
     });
   };
 
-  const handleUserMove = (fen: string) => {
+  const handleUserMove = ({
+                            from,
+                            to,
+                            promotion,
+                          }: {
+    from: string;
+    to: string;
+    promotion?: string;
+  }) => {
     if (status !== "playing") return;
 
-    const chess = new Chess(lastFen);
-    const moves = chess.moves({ verbose: true });
+    const chess = chessRef.current;
+    const expected = puzzle.solutionMoves[currentMoveIndex];
+    const played = from + to + (promotion ?? "");
 
-    const userMove = moves.find((m) => {
-      const temp = new Chess(lastFen);
-      temp.move(m);
-      return temp.fen() === fen;
-    });
-
-    if (!userMove) {
-      setStatus("lost"); // illegal move
+    if (played !== expected) {
+      applyMoveHighlight(from, to);
+      setStatus("lost");
       return;
     }
 
-    const userMoveUci = userMove.from + userMove.to + (userMove.promotion ?? "");
-    const correctMove = puzzle.solutionMoves[currentMoveIndex];
-
-    if (userMoveUci !== correctMove) {
-      setStatus("lost"); // wrong move
-      applyMoveHighlight({ from: userMove.from, to: userMove.to });
+    const move = chess.move({ from, to, promotion });
+    if (!move) {
+      setStatus("lost");
       return;
     }
 
-    // Apply user move
-    chess.move(userMove);
-    applyMoveHighlight({ from: userMove.from, to: userMove.to });
+    applyMoveHighlight(from, to);
 
-    let nextMoveIndex = currentMoveIndex + 1;
+    let next = currentMoveIndex + 1;
 
-    // Auto-play opponent move
-    if (nextMoveIndex < puzzle.solutionMoves.length) {
-      const opponentMoveUci = puzzle.solutionMoves[nextMoveIndex];
-      const from = opponentMoveUci.slice(0, 2);
-      const to = opponentMoveUci.slice(2, 4);
-      const promotion = opponentMoveUci.length === 5 ? opponentMoveUci[4] : undefined;
-      chess.move({ from, to, promotion });
-      applyMoveHighlight({ from, to });
-      nextMoveIndex += 1;
+    if (next < puzzle.solutionMoves.length) {
+      const opp = puzzle.solutionMoves[next];
+      const oFrom = opp.slice(0, 2);
+      const oTo = opp.slice(2, 4);
+      const oPromotion = opp.length === 5 ? opp[4] : undefined;
+
+      setTimeout(() => {
+        chess.move({ from: oFrom, to: oTo, promotion: oPromotion });
+        applyMoveHighlight(oFrom, oTo);
+        setGame(new Chess(chess.fen()));
+      }, 350);
+
+      next++;
     }
 
-    setGame(chess);
-    chessRef.current = chess;
-    setLastFen(chess.fen());
-    setCurrentMoveIndex(nextMoveIndex);
+    setGame(new Chess(chess.fen()));
+    setCurrentMoveIndex(next);
 
-    if (nextMoveIndex >= puzzle.solutionMoves.length) {
+    if (next >= puzzle.solutionMoves.length) {
       setStatus("won");
     }
   };
@@ -90,25 +93,26 @@ export const PuzzleGame: React.FC<Props> = ({ puzzle }) => {
   const resetPuzzle = () => {
     const chess = new Chess();
     chess.load(puzzle.fen);
+
     chessRef.current = chess;
     setGame(chess);
-    setLastFen(puzzle.fen);
     setStatus("playing");
     setCurrentMoveIndex(0);
     setHighlightSquares({});
   };
 
-  // Optional: hint feature
   const showHint = () => {
     if (status !== "playing") return;
-    const nextMoveUci = puzzle.solutionMoves[currentMoveIndex];
-    const from = nextMoveUci.slice(0, 2);
-    const to = nextMoveUci.slice(2, 4);
-    applyMoveHighlight({ from, to });
+    const move = puzzle.solutionMoves[currentMoveIndex];
+    applyMoveHighlight(move.slice(0, 2), move.slice(2, 4));
   };
 
+  const progress = currentMoveIndex / puzzle.solutionMoves.length;
+
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col lg:flex-row gap-12 items-start justify-center py-10 px-6">
+
+      {/* Board */}
       <ChessGameBoard
         key={puzzle.id}
         game={game}
@@ -119,34 +123,70 @@ export const PuzzleGame: React.FC<Props> = ({ puzzle }) => {
         customSquareStyles={highlightSquares}
       />
 
-      <div className="flex flex-col items-center gap-2 text-center">
-        {status === "playing" && <p className="text-yellow-600 font-semibold">Find the best move!</p>}
-        {status === "won" && <p className="text-green-600 font-bold">✅ Correct! Puzzle solved!</p>}
-        {status === "lost" && (
-          <>
-            <p className="text-red-600 font-bold">❌ Wrong move!</p>
-          </>
+      {/* Minimal Side Panel */}
+      <div className="w-80 space-y-6">
+
+        <div className="space-y-2">
+          <h2 className="text-lg font-semibold tracking-wide">
+            Puzzle
+          </h2>
+
+          <div className="h-1 bg-neutral-700 rounded">
+            <div
+              className="h-1 bg-neutral-300 rounded transition-all"
+              style={{ width: `${progress * 100}%` }}
+            />
+          </div>
+
+          <p className="text-sm text-neutral-400">
+            Move {Math.floor(currentMoveIndex / 2)} /{" "}
+            {Math.ceil(puzzle.solutionMoves.length / 2)}
+          </p>
+        </div>
+
+        {status === "playing" && (
+          <p className="text-neutral-300">
+            Find the best move.
+          </p>
         )}
 
-        <div className="flex gap-2 mt-2">
+        {status === "won" && (
+          <p className="text-neutral-100 font-medium">
+            Puzzle solved.
+          </p>
+        )}
+
+        {status === "lost" && (
+          <p className="text-neutral-400">
+            Incorrect. Try again.
+          </p>
+        )}
+
+        <div className="flex flex-col gap-3 pt-4">
+
           <button
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
             onClick={resetPuzzle}
+            className="border border-neutral-600 hover:border-neutral-400 transition py-2 text-sm tracking-wide"
           >
             Reset
           </button>
+
           {status === "playing" && (
             <button
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
               onClick={showHint}
+              className="border border-neutral-700 hover:border-neutral-500 transition py-2 text-sm tracking-wide"
             >
               Hint
             </button>
           )}
-        </div>
 
-        <div className="mt-2 text-sm text-gray-500">
-          Move {Math.round((currentMoveIndex) / 2)} of {Math.round(puzzle.solutionMoves.length / 2)}
+          <button
+            onClick={onSkip}
+            className="border border-neutral-700 hover:border-neutral-500 transition py-2 text-sm tracking-wide"
+          >
+            Skip →
+          </button>
+
         </div>
       </div>
     </div>

@@ -99,7 +99,7 @@ export class UciEngine {
   private async setElo(elo: number) {
     if (elo === this.elo) return;
 
-    if (elo < 1320 || elo > 3190) {
+    if (elo < 600 || elo > 3200) {
       throw new Error(`Invalid Elo value : ${elo}`);
     }
 

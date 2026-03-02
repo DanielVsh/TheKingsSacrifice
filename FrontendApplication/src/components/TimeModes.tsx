@@ -1,6 +1,6 @@
-import {useState} from "react";
-import {motion} from "framer-motion";
-import {GameMode} from "../app/interfaces/IGame.ts";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { GameMode } from "../app/interfaces/IGame.ts";
 
 type TimeMode = {
   name: string;
@@ -33,12 +33,13 @@ const TIME_MODE_GROUPS: Record<GameMode, TimeMode[]> = {
     { name: "60+0", time: "60 min", increment: "0", category: GameMode.CLASSICAL },
     { name: "90+30", time: "90 min", increment: "30s", category: GameMode.CLASSICAL },
   ],
-  [GameMode.NON_RATING]: [
-
-  ],
+  [GameMode.NON_RATING]: [],
 };
 
-export default function TimeModes({onSelect, onActiveCategoryChange}: {
+export default function TimeModes({
+                                    onSelect,
+                                    onActiveCategoryChange,
+                                  }: {
   onSelect: (mode: TimeMode) => void;
   onActiveCategoryChange: (category: GameMode) => void;
 }) {
@@ -60,12 +61,14 @@ export default function TimeModes({onSelect, onActiveCategoryChange}: {
           <button
             key={cat}
             onClick={() => {
-              setActiveCategory(cat)
-              onActiveCategoryChange(cat)
-            }
-          }
-            className={`px-4 py-2 rounded-xl font-semibold text-sm sm:text-base transition
-              ${activeCategory === cat ? "bg-emerald-600 text-white" : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"}`}
+              setActiveCategory(cat);
+              onActiveCategoryChange(cat);
+            }}
+            className={`px-4 py-2 border border-white/20 text-sm sm:text-base font-semibold transition
+              ${activeCategory === cat
+              ? "bg-white/10 text-white"
+              : "bg-zinc-900 text-zinc-400 hover:bg-white/5"} 
+              `}
           >
             {cat}
           </button>
@@ -75,14 +78,14 @@ export default function TimeModes({onSelect, onActiveCategoryChange}: {
       {/* Mode Buttons for Active Category */}
       <div className="w-full max-w-5xl flex flex-wrap gap-3 justify-center">
         {TIME_MODE_GROUPS[activeCategory].map((mode) => (
-          <div key={mode.name} className="relative">
+          <div key={mode.name} className="relative w-40 sm:w-44">
             {selected?.name === mode.name ? (
               <motion.button
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.2 }}
                 onClick={() => onSelect(selected)}
-                className="px-6 py-3 sm:px-8 sm:py-4 bg-emerald-600 hover:bg-emerald-700 rounded-xl text-sm sm:text-base font-semibold shadow-md"
+                className="w-full px-4 py-3 border border-white/20 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md transition-all"
               >
                 Play {mode.name} Rated Game
               </motion.button>
@@ -91,11 +94,10 @@ export default function TimeModes({onSelect, onActiveCategoryChange}: {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => setSelected(mode)}
-                className="rounded-xl border-2 px-4 py-3 text-left shadow-md text-sm sm:text-base transition-all
-                  border-zinc-700 hover:border-emerald-500"
+                className="w-full flex flex-col items-start px-4 py-3 border border-white/20 text-white/80 hover:border-emerald-500 hover:bg-white/5 shadow-md transition-all"
               >
                 <div className="font-bold">{mode.name}</div>
-                <div className="text-xs text-zinc-400">
+                <div className="text-xs text-white/60">
                   {mode.time}
                   {mode.increment !== "0" && ` | +${mode.increment}`}
                 </div>

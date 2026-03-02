@@ -20,7 +20,6 @@ import { useEffect, useCallback } from "react";
 import { usePlayersData } from "@/hooks/usePlayersData";
 import { Typography } from "@mui/material";
 import { useCurrentPosition } from "../hooks/useCurrentPosition";
-import {blue} from "@mui/material/colors";
 
 export default function AnalyzeButton() {
   const engineName = useAtomValue(engineNameAtom);
@@ -117,13 +116,13 @@ export default function AnalyzeButton() {
 
   return (
     <LoadingButton
-      variant="contained"
+      variant="outlined"
       size="small"
-      startIcon={<Icon icon="streamline:magnifying-glass-solid" height={12} color={blue[400]}/>}
+      startIcon={<Icon icon="streamline:magnifying-glass-solid" height={12}/>}
       onClick={handleAnalyze}
       disabled={!readyToAnalyse}
     >
-      <Typography fontSize="0.9em" fontWeight="500" lineHeight="1.4em" color={blue[400]}>
+      <Typography fontSize="0.9em" fontWeight="500" lineHeight="1.4em">
         {gameEval ? "Analyze again" : "Analyze"}
       </Typography>
     </LoadingButton>

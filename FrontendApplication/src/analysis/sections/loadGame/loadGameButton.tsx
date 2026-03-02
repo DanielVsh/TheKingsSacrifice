@@ -15,7 +15,7 @@ export default function LoadGameButton({ setGame, label, size }: Props) {
   return (
     <>
       <Button
-        variant="contained"
+        variant="outlined"
         onClick={() => setOpenDialog(true)}
         size={size}
       >

@@ -167,8 +167,8 @@ export default function GameSettingsDialog({ open, onClose }: Props) {
             label="Bot Elo rating"
             value={engineElo}
             setValue={setEngineElo}
-            min={1320}
-            max={3190}
+            min={600}
+            max={3200}
             step={10}
             marksFilter={374}
           />

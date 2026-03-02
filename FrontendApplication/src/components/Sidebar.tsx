@@ -30,7 +30,7 @@ const Sidebar = () => {
               }`
             }
           >
-            ♞ Play
+            Play
           </NavLink>
 
           <NavLink
@@ -43,7 +43,7 @@ const Sidebar = () => {
               }`
             }
           >
-            📊 Dashboard
+            Dashboard
           </NavLink>
 
           <NavLink
@@ -56,7 +56,7 @@ const Sidebar = () => {
               }`
             }
           >
-            🤖 Practice
+            Practice
           </NavLink>
 
           <NavLink
@@ -69,7 +69,7 @@ const Sidebar = () => {
               }`
             }
           >
-            🧩 Puzzles
+            Puzzles
           </NavLink>
 
           <NavLink
@@ -82,7 +82,7 @@ const Sidebar = () => {
               }`
             }
           >
-            📈 Analysis
+            Analysis
           </NavLink>
 
           <NavLink
@@ -95,7 +95,7 @@ const Sidebar = () => {
               }`
             }
           >
-            👤 Profile
+            Profile
           </NavLink>
         </ul>
       </nav>
@@ -106,7 +106,7 @@ const Sidebar = () => {
           to="/logout"
           className="flex items-center gap-3 px-4 py-2 rounded-lg text-red-400 hover:bg-red-500/10 transition"
         >
-          ⏻ Logout
+          Logout
         </NavLink>
       </div>
     </aside>
