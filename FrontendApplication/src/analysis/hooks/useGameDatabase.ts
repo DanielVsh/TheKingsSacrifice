@@ -1,0 +1,135 @@
+import { formatGameToDatabase } from "@/lib/chess";
+import { GameEval } from "@/types/eval";
+import { Game } from "@/types/game";
+import { Chess } from "chess.js";
+import { openDB, DBSchema, IDBPDatabase } from "idb";
+import { atom, useAtom } from "jotai";
+import { useCallback, useEffect, useState } from "react";
+import {useSearchParams} from "react-router-dom";
+
+interface GameDatabaseSchema extends DBSchema {
+  games: {
+    value: Game;
+    key: number | string;
+  };
+}
+
+const gamesAtom = atom<Game[]>([]);
+const fetchGamesAtom = atom<boolean>(false);
+
+export const useGameDatabase = (shouldFetchGames?: boolean) => {
+  const [db, setDb] = useState<IDBPDatabase<GameDatabaseSchema> | null>(null);
+  const [games, setGames] = useAtom(gamesAtom);
+  const [fetchGames, setFetchGames] = useAtom(fetchGamesAtom);
+  const [gameFromUrl, setGameFromUrl] = useState<Game | undefined>(undefined);
+
+  useEffect(() => {
+    if (shouldFetchGames !== undefined) {
+      setFetchGames(shouldFetchGames);
+    }
+  }, [shouldFetchGames, setFetchGames]);
+
+  useEffect(() => {
+    const initDatabase = async () => {
+      const db = await openDB<GameDatabaseSchema>("games", 1, {
+        upgrade(db) {
+          db.createObjectStore("games", { keyPath: "id", autoIncrement: true });
+        },
+      });
+      setDb(db);
+    };
+
+    initDatabase();
+  }, []);
+
+  const loadGames = useCallback(async () => {
+    if (db && fetchGames) {
+      const games = await db.getAll("games");
+      setGames(games);
+    }
+  }, [db, fetchGames, setGames]);
+
+  useEffect(() => {
+    loadGames();
+  }, [loadGames]);
+
+  const addGame = useCallback(
+    async (game: Chess, key?: string) => {
+      if (!db) throw new Error("Database not initialized");
+
+      let gameToAdd
+      gameToAdd = key ? {
+        ...formatGameToDatabase(game),
+        id: key
+      } : formatGameToDatabase(game);
+
+      const gameId = await db.add("games", gameToAdd as Game);
+
+      loadGames();
+
+      return gameId;
+    },
+    [db, loadGames]
+  );
+
+  const setGameEval = useCallback(
+    async (gameId: number | string, evaluation: GameEval) => {
+      if (!db) throw new Error("Database not initialized");
+
+      const game = await db.get("games", gameId);
+      if (!game) throw new Error("Game not found");
+
+      await db.put("games", { ...game, eval: evaluation });
+
+      loadGames();
+    },
+    [db, loadGames]
+  );
+
+  const getGame = useCallback(
+    async (gameId: number | string) => {
+      if (!db) return undefined;
+
+      return db.get("games", gameId);
+    },
+    [db]
+  );
+
+  const deleteGame = useCallback(
+    async (gameId: number) => {
+      if (!db) throw new Error("Database not initialized");
+
+      await db.delete("games", gameId);
+
+      loadGames();
+    },
+    [db, loadGames]
+  );
+
+  const [searchParams] = useSearchParams()
+  const gameId = searchParams.get('gameId')
+
+  useEffect(() => {
+    if (!gameId) {
+      setGameFromUrl(undefined);
+      return;
+    }
+
+    const key = isNaN(Number(gameId)) ? gameId : parseInt(gameId);
+    getGame(key).then((game) => {
+      setGameFromUrl(game);
+    });
+  }, [gameId, setGameFromUrl, getGame]);
+
+  const isReady = db !== null;
+
+  return {
+    addGame,
+    setGameEval,
+    getGame,
+    deleteGame,
+    games,
+    isReady,
+    gameFromUrl,
+  };
+};

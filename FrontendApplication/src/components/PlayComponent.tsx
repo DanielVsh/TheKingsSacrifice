@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useMemo, useState} from "react";
 import {Chess} from "chess.js";
 import {ChessGameBoard} from "./ChessGameBoard.tsx";
 import {useSaveGameMutation} from "../app/state/api/GameApi.ts";
@@ -31,7 +31,27 @@ export const PlayComponent: React.FC<PlayComponentProps> = (props) => {
     isBeginGameSoundPlayed = true;
   }
 
-  const [game, setGame] = useState(new Chess());
+  const [game, setGame] = useState(() => {
+    const newGame = new Chess();
+
+    if (props.history && props.history.length > 0) {
+      props.history.forEach(uci => {
+        newGame.move({
+          from: uci.slice(0, 2),
+          to: uci.slice(2, 4),
+          promotion: uci[4] || undefined,
+        });
+      });
+    } else {
+      newGame.setHeader('Event', props.gameMode.toString());
+      newGame.setHeader('Site', 'King\'s Sacrifice');
+      newGame.setHeader('Round', '-');
+      newGame.setHeader("White", props.whitePlayer?.nickname ?? "?")
+      newGame.setHeader("Black", props.blackPlayer?.nickname ?? "?")
+      newGame.setHeader("Date", new Date().toISOString().split("T")[0])
+    }
+    return newGame;
+  });
   const [playersTime, setPlayersTime] = useState<PlayerTime>()
 
   const [saveGame] = useSaveGameMutation<GameSaveRequest>();
@@ -51,7 +71,21 @@ export const PlayComponent: React.FC<PlayComponentProps> = (props) => {
     {
       topic: `/topic/game/${props.uuid}`,
       handler: (message: string) => {
-        setGame(new Chess(message));
+        setGame(prev => {
+          const newGame = new Chess();
+          newGame.loadPgn(prev.pgn());
+
+          const from = message.slice(0, 2);
+          const to = message.slice(2, 4);
+          const promotion = message[4] || undefined;
+
+          const validMoves = newGame.moves({ verbose: true });
+          const isValid = validMoves.some(m => m.from === from && m.to === to);
+          if (!isValid) return prev;
+
+          newGame.move({ from, to, promotion });
+          return newGame;
+        });
       },
     },
     {
@@ -79,20 +113,24 @@ export const PlayComponent: React.FC<PlayComponentProps> = (props) => {
       onDrawRequested: setPendingDrawRequest,
       onDrawAccepted: () => {
         setPendingDrawRequest(null)
+        game.setHeader('Result', '1/2-1/2');
         saveGame({
           uuid: props.uuid,
           winner: null,
-          gameResult: GameState.DRAW_AGREEMENT
+          gameResult: GameState.DRAW_AGREEMENT,
+          pgn: game.pgn(),
         })
       },
       onDrawRejected: () => setPendingDrawRequest(null),
     }), [player, props.uuid, sendMessage]);
 
   function sendResignRequest() {
+    game.setHeader('Result', getBoardOrientation() === 'white' ? '0-1' : '1-0');
     saveGame({
       uuid: props.uuid,
       winner: opponent.uuid,
-      gameResult: GameState.RESIGNATION
+      gameResult: GameState.RESIGNATION,
+      pgn: game.pgn(),
     })
   }
 
@@ -106,20 +144,26 @@ export const PlayComponent: React.FC<PlayComponentProps> = (props) => {
     return "white"
   }
 
-  useEffect(() => {
-    props.history.forEach(fen => game.load(fen))
+  // useEffect(() => {
+  //   if (!props.history || props.history.length === 0) return;
+  //
+  //   const newGame = new Chess();
+  //   props.history.forEach(uci => {
+  //     newGame.move({
+  //       from: uci.slice(0, 2),
+  //       to: uci.slice(2, 4),
+  //       promotion: uci[4] || undefined,
+  //     });
+  //   });
+  //   setGame(newGame);
+  // }, []);
 
-    if (game.isGameOver()) {
-      setGame(new Chess(game.fen()))
-    }
 
-  }, []);
-
-
-  const sendMove = (fen: string) => {
+  const sendMove = (move: { from: string; to: string; promotion?: string }) => {
+    const uci = move.from + move.to + (move.promotion ?? "")
     sendMessage({
       destination: `/game/${props.uuid}/move`,
-      body: fen,
+      body: uci,
     })
   };
 
@@ -132,9 +176,12 @@ export const PlayComponent: React.FC<PlayComponentProps> = (props) => {
     return true;
   }
 
-  const handleUserMove = (fen: string) => {
-    setGame(new Chess(fen));
-    sendMove(game.fen());
+  const handleUserMove = (move: { from: string; to: string; promotion?: string }) => {
+    const newGame = new Chess();
+    newGame.loadPgn(game.pgn());
+    newGame.move(move);
+    setGame(newGame);
+    sendMove(move);
 
     if (game.isGameOver()) {
       let gameState = determineGameState(game);
@@ -147,11 +194,12 @@ export const PlayComponent: React.FC<PlayComponentProps> = (props) => {
       if (gameState === GameState.CHECKMATE || gameState === GameState.TIMEOUT) {
         winner = determineWinner(game, props);
       }
-
+      game.setHeader('Result', game.turn() === "w" ? '0-1' : '1-0');
       saveGame({
         uuid: props.uuid,
         gameResult: gameState,
         winner: winner?.uuid ?? null,
+        pgn: game.pgn()
       });
     }
   };

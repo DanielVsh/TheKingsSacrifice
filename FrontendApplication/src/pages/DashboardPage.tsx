@@ -4,12 +4,20 @@ import {useEffect} from "react";
 import {useDispatch} from "react-redux";
 import {LoadingElement} from "../components/LoadingElement.tsx";
 import {useGetGamesDataQuery} from "../app/state/api/GameApi.ts";
-import {Link} from "react-router-dom";
 import {GameResponse} from "../app/interfaces/IGame.ts";
+import {useGameDatabase} from "@/hooks/useGameDatabase.ts";
+import {useSetAtom} from "jotai";
+import {boardOrientationAtom} from "@/sections/analysis/states.ts";
+import {getGameFromPgn} from "@/lib/chess.ts";
+import {useNavigate} from "react-router-dom";
 
 
 export const DashboardPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const setBoardOrientation = useSetAtom(boardOrientationAtom);
+  const { addGame } = useGameDatabase();
 
   const { data: playerData, error: playerError, isLoading: playerLoading } = useGetPlayerDataQuery();
 
@@ -25,6 +33,7 @@ export const DashboardPage = () => {
     }
   }, [playerData]);
 
+
   if (playerLoading || gamesLoading) return <LoadingElement/>;
   if (playerError || gamesError) return <div>Error loading data.</div>;
 
@@ -33,6 +42,15 @@ export const DashboardPage = () => {
     const minutes = Math.floor(totalSeconds / 60)
     const seconds = totalSeconds % 60
     return `${minutes}:${seconds.toString().padStart(2, "0")}`
+  }
+
+  async function handleAnalysisGame(game: GameResponse, boardOrientation: boolean) {
+    if (!game.pgn) return;
+
+    const gameToAdd = getGameFromPgn(game.pgn);
+    await addGame(gameToAdd, game.uuid)
+    setBoardOrientation(boardOrientation)
+    navigate("/analysis?gameId=" + game.uuid)
   }
 
   return (
@@ -117,13 +135,14 @@ export const DashboardPage = () => {
                   {new Date(game.finishedAt ?? game.createdAt).toLocaleDateString()}
                 </td>
 
-                <td className="px-4 py-2 text-right">
-                  <Link
-                    to={`/game/${game.uuid}`}
-                    className="text-blue-400 hover:text-blue-300"
-                  >
-                    View
-                  </Link>
+                <td className="px-4 py-2 text-right" onClick={() => handleAnalysisGame(game, isPlayerWhite)}>
+                  {/*<Link*/}
+                  {/*  to={`/game/${game.uuid}`}*/}
+                  {/*  className="text-blue-400 hover:text-blue-300"*/}
+                  {/*>*/}
+                  {/*  View*/}
+                  {/*</Link>*/}
+                  Analysissssssssssssss
                 </td>
               </tr>
             )

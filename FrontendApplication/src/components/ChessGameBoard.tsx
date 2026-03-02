@@ -1,4 +1,4 @@
-import React, {Key, useState} from "react";
+import React, {Key, useEffect, useState} from "react";
 import {Arrow, CustomSquareStyles, Piece, PromotionPieceOption, Square} from "react-chessboard/dist/chessboard/types";
 import {Chess, Move} from "chess.js";
 import {Chessboard} from "react-chessboard";
@@ -15,7 +15,7 @@ type SquareMap = { [squareName: string]: SquareOptions };
 interface ChessGameBoardProps {
   game: Chess;
   fen?: string;
-  onUserMove: (fen: string) => void;
+  onUserMove: (move: { from: string; to: string; promotion?: string }) => void;
   boardOrientation: 'white' | 'black'
   canPlayerMove: boolean
   key?: Key
@@ -30,18 +30,27 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
   const [rightClickedSquares, setRightClickedSquares] = useState<any>({});
   const [optionSquares, setOptionSquares] = useState<SquareMap>({});
 
+  const [internalGame] = useState(() => {
+    const g = new Chess();
+    g.loadPgn(props.game.pgn());
+    return g;
+  });
+
+  // sync when parent game changes
+  useEffect(() => {
+    internalGame.loadPgn(props.game.pgn());
+  }, [props.game]);
+
   const onPieceDrop = (sourceSquare: Square, targetSquare: Square, piece: Piece) => {
-    if (props.game.turn() !== piece.charAt(0)) return false
+    if (internalGame.turn() !== piece.charAt(0)) return false
     if (!props.canPlayerMove) return false
 
-    if (props.game.moves({square: sourceSquare, verbose: true}).map(value => value.to).includes(targetSquare)) {
-      props.game.move({from: sourceSquare, to: targetSquare})
-      props.onUserMove(props.game.fen())
-      setOptionSquares({})
-      return true;
-    }
+    const move = internalGame.move({from: sourceSquare, to: targetSquare})
+    if (!move) return false
 
-    return false;
+    props.onUserMove({from: sourceSquare, to: targetSquare})
+    setOptionSquares({})
+    return true;
   }
 
   function onSquareClick(square: Square) {
@@ -54,7 +63,7 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
     }
 
     if (!moveTo) {
-      const moves: Move[] = props.game.moves({
+      const moves: Move[] = internalGame.moves({
         square: moveFrom,
         verbose: true,
       });
@@ -82,10 +91,9 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
         return;
       }
 
-      const move = props.game.move({
+      const move = internalGame.move({
         from: moveFrom,
         to: square,
-        promotion: "q",
       });
 
       if (move === null) {
@@ -94,7 +102,7 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
         return;
       }
 
-      props.onUserMove(props.game.fen())
+      props.onUserMove({from: moveFrom, to: square})
 
       setMoveFrom(null);
       setMoveTo(null);
@@ -126,7 +134,7 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
 
   const getMoveOptions = (square: Square) => {
     if (!props.canPlayerMove) return false
-    const moves = props.game.moves({
+    const moves = internalGame.moves({
       square,
       verbose: true,
     });
@@ -139,8 +147,8 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
     moves.map((move) => {
       newSquares[move.to] = {
         background:
-          props.game.get(move.to) &&
-          props.game.get(move.to)?.color !== props.game.get(square)?.color
+          internalGame.get(move.to) &&
+          internalGame.get(move.to)?.color !== internalGame.get(square)?.color
             ? "radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)"
             : "radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)",
         borderRadius: "50%",
@@ -159,12 +167,12 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
     if (piece && moveFrom && moveTo) {
       const promotionPiece = piece[1]?.toLowerCase() ?? "q";
 
-      props.game.move({
-        from: moveFrom,
-        to: moveTo,
-        promotion: promotionPiece,
-      });
-      props.onUserMove(props.game.fen())
+      // internalGame.move({
+      //   from: moveFrom,
+      //   to: moveTo,
+      //   promotion: promotionPiece,
+      // });
+      props.onUserMove({from: moveFrom, to: moveTo, promotion: promotionPiece});
     }
     setMoveFrom(null);
     setMoveTo(null);
@@ -180,7 +188,7 @@ export const ChessGameBoard: React.FC<ChessGameBoardProps> = (props) => {
         <Chessboard id={"GameBoard"}
                     key={props.key}
                     boardOrientation={props.boardOrientation}
-                    position={props.fen ?? props.game.fen()}
+                    position={props.fen ?? internalGame.fen()}
                     boardWidth={boardWidth}
                     arePremovesAllowed={true}
                     onPieceDrop={onPieceDrop}

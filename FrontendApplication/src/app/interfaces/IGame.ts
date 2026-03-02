@@ -13,6 +13,7 @@ export interface GameResponse {
   gameMode: GameMode
   whiteRatingDelta: number
   blackRatingDelta: number
+  pgn: string
 }
 
 export interface GameCreateRequest {
@@ -32,6 +33,7 @@ export interface GameSaveRequest {
   uuid: string
   winner: string | null
   gameResult: GameState
+  pgn?: string
 }
 
 export interface GameDrawRequest {
