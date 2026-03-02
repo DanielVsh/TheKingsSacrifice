@@ -2,35 +2,39 @@ package com.danielvishnievskyi.backendapplication.utils;
 
 
 import com.danielvishnievskyi.backendapplication.model.entities.GameEntity;
+import com.danielvishnievskyi.backendapplication.model.enums.GameMode;
 import lombok.experimental.UtilityClass;
+
+import java.util.UUID;
 
 @UtilityClass
 public class GameEloRatingUtils {
+  private static final int DEFAULT_K = 32;
+  private static final int MIN_RATING = 100;
+  private static final int MAX_RATING = 3200;
 
-  public ResultRating calculateNewRatings(GameEntity gameEntity) {
-    int whiteRating = gameEntity.getWhitePlayer().getRatingDueToMode(gameEntity.getGameMode());
-    int blackRating = gameEntity.getBlackPlayer().getRatingDueToMode(gameEntity.getGameMode());
+  public ResultRating calculate(GameEntity game) {
+    int whiteRating = game.getWhitePlayer()
+      .getRatingDueToMode(game.getGameMode());
+
+    int blackRating = game.getBlackPlayer()
+      .getRatingDueToMode(game.getGameMode());
 
     double expectedWhite = expectedScore(whiteRating, blackRating);
     double expectedBlack = expectedScore(blackRating, whiteRating);
 
-    int k = 32; // typical for casual play
-    double whiteScore;
-    double blackScore;
+    double whiteScore = resolveScore(game, game.getWhitePlayer().getUuid());
+    double blackScore = resolveScore(game, game.getBlackPlayer().getUuid());
 
-    if (gameEntity.getWinner() == null) {
-      whiteScore = 0.5;
-      blackScore = 0.5;
-    } else if (gameEntity.getWinner().getUuid().equals(gameEntity.getWhitePlayer().getUuid())) {
-      whiteScore = 1;
-      blackScore = 0;
-    } else {
-      whiteScore = 0;
-      blackScore = 1;
-    }
+    int kFactor = resolveKFactor(game.getGameMode());
 
-    int newWhite = (int) Math.round(whiteRating + k * (whiteScore - expectedWhite));
-    int newBlack = (int) Math.round(blackRating + k * (blackScore - expectedBlack));
+    int newWhite = normalizeRating(
+      whiteRating + kFactor * (whiteScore - expectedWhite)
+    );
+
+    int newBlack = normalizeRating(
+      blackRating + kFactor * (blackScore - expectedBlack)
+    );
 
     return new ResultRating(
       newWhite,
@@ -44,10 +48,33 @@ public class GameEloRatingUtils {
     return 1.0 / (1.0 + Math.pow(10, (ratingB - ratingA) / 400.0));
   }
 
+  private double resolveScore(GameEntity game, UUID playerId) {
+    if (game.getWinner() == null) {
+      return 0.5;
+    }
+    return game.getWinner().getUuid().equals(playerId) ? 1.0 : 0.0;
+  }
+
+  private int resolveKFactor(GameMode mode) {
+    return switch (mode) {
+      case BLITZ -> 40;
+      case RAPID -> 32;
+      case CLASSICAL -> 24;
+      default -> DEFAULT_K;
+    };
+  }
+
+  private int normalizeRating(double rating) {
+    int rounded = (int) Math.round(rating);
+    return Math.max(MIN_RATING, Math.min(MAX_RATING, rounded));
+  }
+
   public record ResultRating(
     int newWhiteRating,
     int whiteRatingDelta,
     int newBlackRating,
     int blackRatingDelta
-  ) {}
+  ) {
+  }
 }
+

@@ -58,6 +58,7 @@ public class GameServiceImpl implements GameService {
       gameEntity.setWinner(playerRepository.findById(gameSaveRequestDTO.getWinner()).orElseThrow());
     }
     gameEntity.setGameResult(gameSaveRequestDTO.getGameResult());
+    gameEntity.setPgn(gameSaveRequestDTO.getPgn());
 
     GameResponseDTO gameResponseDTO = gameMapper.mapToResponseDTO(gameEntity);
     messagingTemplate.convertAndSend("/topic/game/" + gameEntity.getUuid() + "/finished", gameResponseDTO);
@@ -146,7 +147,7 @@ public class GameServiceImpl implements GameService {
   }
 
   @Override
-  public GameResponseDTO updateGameMove(String gameId, String fen) {
+  public GameResponseDTO updateGameMove(String gameId, String move) {
     GameEntity gameEntity = gameRepository.findById(UUID.fromString(gameId))
       .orElseThrow(() -> new RuntimeException("Game[%s] not found".formatted(gameId)));
 
@@ -154,20 +155,23 @@ public class GameServiceImpl implements GameService {
       throw new RuntimeException("Game[%s] is not in ONGOING state".formatted(gameId));
     }
 
-    gameEntity.getHistory().add(fen);
+    gameEntity.getHistory().add(move);
+
+    int moveCount = gameEntity.getHistory().size();
+    boolean isWhiteMove = moveCount % 2 == 1; // first move is white
 
     GameTimeEntity gameTime = gameEntity.getGameTime();
     if (gameTime != null) {
-      if (FenUtils.getActiveColor(fen) == Color.WHITE) {
-        if (gameEntity.getHistory().size() == 2) {
-          gameTime.setBlackPlayerTime(gameEntity.getBasicGameTime() * 1000L);
-        }
-        gameTime.updateBlackPlayerTime(gameEntity.getIncreaseTimePerMove() * 1000);
-      } else {
-        if (gameEntity.getHistory().size() == 1) {
+      if (isWhiteMove) {
+        if (moveCount == 1) {
           gameTime.setWhitePlayerTime(gameEntity.getBasicGameTime() * 1000L);
         }
         gameTime.updateWhitePlayerTime(gameEntity.getIncreaseTimePerMove() * 1000);
+      } else {
+        if (moveCount == 2) {
+          gameTime.setBlackPlayerTime(gameEntity.getBasicGameTime() * 1000L);
+        }
+        gameTime.updateBlackPlayerTime(gameEntity.getIncreaseTimePerMove() * 1000);
       }
     }
 

@@ -3,13 +3,17 @@ package com.danielvishnievskyi.backendapplication.model.entities;
 import com.danielvishnievskyi.backendapplication.model.enums.GameMode;
 import com.danielvishnievskyi.backendapplication.model.enums.GameState;
 import com.danielvishnievskyi.backendapplication.utils.GameEloRatingUtils;
+import com.github.bhlangonijr.chesslib.game.GameResult;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
+
+import static com.danielvishnievskyi.backendapplication.model.enums.GameState.*;
 
 @Entity
 @Getter
@@ -98,7 +102,12 @@ public class GameEntity {
       this.finishedAt = LocalDateTime.now();
       this.gameResult = gameResult;
 
-      if (gameMode != GameMode.NON_RATING) {
+      if (gameMode != GameMode.NON_RATING && !EnumSet.of(
+        DRAW_BY_INSUFFICIENT_MATERIAL,
+        DRAW_BY_FIFTY_MOVES_RULE,
+        DRAW_BY_THREEFOLD_REPETITION,
+        DRAW_AGREEMENT
+      ).contains(gameResult)) {
         updatePlayersRating();
       }
     }
@@ -106,7 +115,7 @@ public class GameEntity {
   }
 
   private void updatePlayersRating() {
-    GameEloRatingUtils.ResultRating resultRating = GameEloRatingUtils.calculateNewRatings(this);
+    GameEloRatingUtils.ResultRating resultRating = GameEloRatingUtils.calculate(this);
     this.whiteRatingDelta = resultRating.whiteRatingDelta();
     this.blackRatingDelta = resultRating.blackRatingDelta();
     this.getWhitePlayer().setRatingDueToMode(resultRating.newWhiteRating(), gameMode);

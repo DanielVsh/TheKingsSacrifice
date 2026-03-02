@@ -30,4 +30,5 @@ public class GameResponseDTO {
   private int whiteRatingDelta;
   private int blackRatingDelta;
   private GameMode gameMode;
+  private String pgn;
 }

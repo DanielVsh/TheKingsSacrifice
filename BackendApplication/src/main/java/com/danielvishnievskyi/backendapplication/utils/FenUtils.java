@@ -1,10 +1,13 @@
 package com.danielvishnievskyi.backendapplication.utils;
 
 import com.danielvishnievskyi.backendapplication.model.enums.Color;
+import com.github.bhlangonijr.chesslib.Board;
+import com.github.bhlangonijr.chesslib.move.Move;
 import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @UtilityClass
 public class FenUtils {
@@ -82,6 +85,20 @@ public class FenUtils {
     return (fromSquare != null && toSquare != null) ? fromSquare + toSquare : null;
   }
 
+  public static Optional<String> findMove(String fenBefore, String fenAfter) {
+    Board before = new Board();
+    before.loadFromFen(fenBefore);
+    for (Move move : before.legalMoves()) {
+      Board test = new Board();
+      test.loadFromFen(fenBefore);
+      test.doMove(move);
+      if (test.getFen().equals(fenAfter)) {
+        return Optional.of(move.toString()); // returns UCI format (like "e2e4")
+      }
+    }
+    return Optional.empty(); // if something’s inconsistent
+  }
+
   private static void validateFen(String fen) {
     if (fen == null || fen.isEmpty() || fen.split(" ").length != 6) {
       throw new IllegalArgumentException("Invalid FEN format.");
@@ -106,4 +123,6 @@ public class FenUtils {
     int rankChar = 8 - rank;
     return fileChar + String.valueOf(rankChar);
   }
+
+
 }
