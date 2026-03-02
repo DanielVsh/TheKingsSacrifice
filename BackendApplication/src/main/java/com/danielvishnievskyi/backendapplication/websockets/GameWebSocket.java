@@ -39,9 +39,9 @@ public class GameWebSocket {
   @MessageMapping("/game/{gameuuid}/move")
   public void makeMove(
     @DestinationVariable String gameuuid,
-    @Payload String fen
+    @Payload String move
     ) {
-    GameResponseDTO gameResponseDTO = gameService.updateGameMove(gameuuid, fen);
+    GameResponseDTO gameResponseDTO = gameService.updateGameMove(gameuuid, move);
 
     messagingTemplate.convertAndSend("/topic/game/" + gameuuid,
       gameResponseDTO.getHistory().getLast()
@@ -67,11 +67,11 @@ public class GameWebSocket {
     gameRepository.getAllNotUnlimitedOngoingGames().parallelStream()
       .forEach(gameEntity -> {
         final GameTimeEntity gameTime = gameEntity.getGameTime();
-        final List<String> gameFenHistory = gameEntity.getHistory();
+        final List<String> moveHistory = gameEntity.getHistory();
 
-        final boolean isWhiteFirstMove = gameFenHistory.isEmpty();
-        final boolean isBlackTurnToMove = !isWhiteFirstMove && FenUtils.getActiveColor(gameFenHistory.getLast()) == Color.BLACK;
-        final boolean isBlackFirstMove = gameEntity.getHistory().size() == 1;
+        final boolean isWhiteFirstMove = moveHistory.isEmpty();
+        final boolean isBlackTurnToMove = !isWhiteFirstMove && moveHistory.size() % 2 == 1;
+        final boolean isBlackFirstMove = moveHistory.size() == 1;
 
         if (isBlackTurnToMove) {
           gameTime.updateBlackPlayerTime(-100);
