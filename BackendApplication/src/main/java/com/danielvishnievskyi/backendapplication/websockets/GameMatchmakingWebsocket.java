@@ -6,16 +6,17 @@ import com.danielvishnievskyi.backendapplication.model.dto.game.GameStartRequest
 import com.danielvishnievskyi.backendapplication.model.dto.player.PlayerMatchRequestDTO;
 import com.danielvishnievskyi.backendapplication.services.GameService;
 import com.danielvishnievskyi.backendapplication.services.MatchmakingService;
+import com.danielvishnievskyi.backendapplication.services.MatchmakingServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @Slf4j
@@ -29,7 +30,6 @@ public class GameMatchmakingWebsocket {
 
   @MessageMapping("/find-rated")
   public void findMatch(PlayerMatchRequestDTO request) {
-
     Optional<GamePairDTO> matchOpt = matchmakingService.tryMatch(request);
 
     if (matchOpt.isPresent()) {
@@ -65,6 +65,70 @@ public class GameMatchmakingWebsocket {
           matchmakingService.getPlayersCountByTimeMode(request.timeFormat())
         )
       );
+    }
+  }
+
+  @Scheduled(fixedRate = 2000)
+  @Transactional
+  public void retryMatching() {
+    Map<UUID, MatchmakingServiceImpl.QueuedPlayer> queue = matchmakingService.getQueue();
+    if (queue.isEmpty()) return;
+
+    List<MatchmakingServiceImpl.QueuedPlayer> playersToRetry = new ArrayList<>(queue.values());
+
+    for (MatchmakingServiceImpl.QueuedPlayer player : playersToRetry) {
+      if (!queue.containsKey(player.request().playerUUID())) {
+        continue;
+      }
+
+      // Try to match this player again
+      Optional<GamePairDTO> matchOpt = matchmakingService.tryMatch(player.request());
+
+      if (matchOpt.isPresent()) {
+        GamePairDTO match = matchOpt.get();
+
+        try {
+          // Create the game
+          var createdGame = gameService.createGame(new GameCreateRequestDTO(
+            match.white().playerUUID(),
+            match.black().playerUUID(),
+            player.request().timeFormat(),
+            player.request().gameMode()
+          ));
+
+          // Start the game
+          var startedGame = gameService.startGame(
+            createdGame.getUuid(),
+            new GameStartRequestDTO(
+              match.white().playerUUID(),
+              match.black().playerUUID()
+            )
+          );
+
+          // Notify both players
+          messagingTemplate.convertAndSend(
+            "/topic/user/%s/queue/match".formatted(match.white().playerUUID()),
+            startedGame
+          );
+          messagingTemplate.convertAndSend(
+            "/topic/user/%s/queue/match".formatted(match.black().playerUUID()),
+            startedGame
+          );
+
+          log.info("Match created via scheduled retry: {} vs {}",
+            match.white().playerUUID(), match.black().playerUUID());
+        } catch (Exception e) {
+          log.error("Error creating game for matched players", e);
+        }
+      } else {
+        playersToRetry.forEach(p -> messagingTemplate.convertAndSend(
+          "/topic/user/%s/queue/match/size".formatted(p.request().playerUUID()),
+          new MatchmakingQueueSize(
+            matchmakingService.getPlayersCount(),
+            matchmakingService.getPlayersCountByTimeMode(p.request().timeFormat())
+          )
+        ));
+      }
     }
   }
 

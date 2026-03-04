@@ -3,6 +3,7 @@ package com.danielvishnievskyi.backendapplication.services;
 import com.danielvishnievskyi.backendapplication.model.dto.game.GamePairDTO;
 import com.danielvishnievskyi.backendapplication.model.dto.player.PlayerMatchRequestDTO;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,4 +13,5 @@ public interface MatchmakingService {
   void addToQueue(PlayerMatchRequestDTO request);
   long getPlayersCount();
   long getPlayersCountByTimeMode(String timeMode);
+  Map<UUID, MatchmakingServiceImpl.QueuedPlayer> getQueue();
 }

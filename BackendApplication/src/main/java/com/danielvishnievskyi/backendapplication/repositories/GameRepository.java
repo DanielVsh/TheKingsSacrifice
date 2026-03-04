@@ -35,7 +35,7 @@ public interface GameRepository extends JpaRepository<GameEntity, UUID>, JpaSpec
 
   @Query(value = """
     select g from GameEntity g
-    where g.gameResult != 'ONGOING' and g.gameResult != 'CREATED' and g.gameResult != 'ABANDONED'
+    where g.gameResult != 'ONGOING' and g.gameResult != 'CREATED' and g.gameResult != 'ABANDONED' and g.gameResult != 'TIMEOUT'
   """)
   List<GameEntity> getAllEndedGames();
 }

@@ -13,5 +13,6 @@ public enum PuzzleTheme {
   DEFLECTION,
   ENDGAME,
   ADVANTAGE,
-  PROMOTION
+  PROMOTION,
+  CHECK
 }

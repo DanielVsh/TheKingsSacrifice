@@ -58,9 +58,11 @@ public class GameEntity {
   @Column(name = "finished_date")
   private LocalDateTime finishedAt;
 
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(fetch = FetchType.LAZY)
   private List<String> history;
 
+  @Basic(fetch = FetchType.LAZY)
+  @Column(columnDefinition = "TEXT")
   private String pgn;
 
   @Column(name = "white_rating_delta")
