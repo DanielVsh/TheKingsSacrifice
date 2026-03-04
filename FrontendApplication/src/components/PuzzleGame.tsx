@@ -31,8 +31,8 @@ export const PuzzleGame: React.FC<Props> = ({ puzzle, onSkip }) => {
 
   const applyMoveHighlight = (from: string, to: string) => {
     setHighlightSquares({
-      [from]: { backgroundColor: "rgba(180,180,180,0.25)" },
-      [to]: { backgroundColor: "rgba(120,120,120,0.35)" },
+      [from]: { backgroundColor: "rgb(237,131,59)" },
+      [to]: { backgroundColor: "rgb(184,82,13)" },
     });
   };
 
@@ -139,7 +139,7 @@ export const PuzzleGame: React.FC<Props> = ({ puzzle, onSkip }) => {
           </div>
 
           <p className="text-sm text-neutral-400">
-            Move {Math.floor(currentMoveIndex / 2)} /{" "}
+            Move {Math.round(currentMoveIndex / 2)} /{" "}
             {Math.ceil(puzzle.solutionMoves.length / 2)}
           </p>
         </div>

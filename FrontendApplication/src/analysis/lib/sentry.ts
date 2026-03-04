@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/react";
 
 export const isSentryEnabled = () =>
-  !!process.env.NEXT_PUBLIC_SENTRY_DSN && Sentry.isInitialized();
+  !!import.meta.env.VITE_FIREBASE_SENTRY_DSN && Sentry.isInitialized();
 
 export const logErrorToSentry = (
   error: unknown,

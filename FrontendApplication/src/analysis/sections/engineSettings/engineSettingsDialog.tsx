@@ -92,13 +92,10 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
             size={{ xs: 12, sm: 7, md: 8 }}
           >
             <Typography variant="body2">
-              {ENGINE_LABELS[DEFAULT_ENGINE].small} is the default engine if
-              your device support its requirements. It offers the best balance
+              {ENGINE_LABELS[DEFAULT_ENGINE].small} is the default engine. It offers the best balance
               between speed and strength.{" "}
               {ENGINE_LABELS[STRONGEST_ENGINE].small} is the strongest engine
-              available, note that it requires a one time download of{" "}
-              {ENGINE_LABELS[STRONGEST_ENGINE].sizeMb}MB and is much more
-              compute intensive.
+              available.
             </Typography>
           </Grid>
 

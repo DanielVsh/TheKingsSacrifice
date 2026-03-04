@@ -1,6 +1,6 @@
 import {
    Grid,
-  Grid2Props as GridProps,
+  GridProps,
   Stack,
   Typography,
 } from "@mui/material";

@@ -124,11 +124,9 @@ export default function GameSettingsDialog({ open, onClose }: Props) {
       </DialogTitle>
       <DialogContent sx={{ paddingBottom: 0 }}>
         <Typography>
-          {ENGINE_LABELS[DEFAULT_ENGINE].small} is the default engine if your
-          device support its requirements. It offers the best balance between
+          {ENGINE_LABELS[DEFAULT_ENGINE].small} is the default engine. It offers the best balance between
           speed and strength. {ENGINE_LABELS[STRONGEST_ENGINE].small} is the
-          strongest engine available, note that it requires a one time download
-          of 75MB.
+          strongest engine available.
         </Typography>
         <Grid
           marginTop={4}

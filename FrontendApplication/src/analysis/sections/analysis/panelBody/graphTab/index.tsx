@@ -1,4 +1,4 @@
-import { Box,  Grid, Grid2Props as GridProps } from "@mui/material";
+import { Box,  Grid, GridProps } from "@mui/material";
 import { useAtomValue } from "jotai";
 import {
   Area,
@@ -16,8 +16,7 @@ import {
   gameAtom,
   gameEvalAtom,
 } from "../../states";
-import { useCallback, useMemo } from "react";
-import type { ReactElement } from "react";
+import {useCallback, useMemo} from "react";
 import CustomTooltip from "./tooltip";
 import { ChartItemData } from "./types";
 import { PositionEval } from "@/types/eval";
@@ -54,14 +53,12 @@ export default function GraphTab(props: GridProps) {
     ? CLASSIFICATION_COLORS[currentPosition.eval.moveClassification]
     : "grey";
 
-  // Render a dot only on selected classifications (always returns an element)
-  const renderDot = useCallback(
-    (
-      props: DotProps & { payload?: ChartItemData }
-    ): ReactElement<SVGElement> => {
+  const renderDot: any | undefined = useCallback(
+    (props: DotProps & { payload?: ChartItemData }) => {
       const payload = props.payload;
       const moveClass = payload?.moveClassification;
-      if (!moveClass) return <svg key={props.key} />;
+
+      if (!moveClass) return undefined;
 
       if (
         [
@@ -73,10 +70,10 @@ export default function GraphTab(props: GridProps) {
         (moveClass === MoveClassification.Best &&
           bestDotIndices.has(payload.moveNb))
       ) {
-        return <CustomDot {...props} key={props.key} payload={payload} />;
+        return <CustomDot {...props} payload={payload} />;
       }
 
-      return <svg key={props.key} />;
+      return undefined;
     },
     [bestDotIndices]
   );
@@ -98,6 +95,7 @@ export default function GraphTab(props: GridProps) {
       <Box
         height="100%"
         width={{ xs: "100%", lg: "90%" }}
+
         sx={{
           backgroundColor: "#2e2e2e",
           borderRadius: "15px",
@@ -110,10 +108,10 @@ export default function GraphTab(props: GridProps) {
             height={400}
             data={chartData}
             margin={{ top: 0, left: 0, right: 0, bottom: 0 }}
-            onClick={(e) => {
-              const payload = e?.activePayload?.[0]?.payload as
-                | ChartItemData
-                | undefined;
+            onClick={(state: any) => {
+              const payload = state?.activeTooltipIndex !== undefined
+                ? chartData[state.activeTooltipIndex]
+                : undefined;
               if (!payload) return;
 
               goToMove(payload.moveNb, game);
