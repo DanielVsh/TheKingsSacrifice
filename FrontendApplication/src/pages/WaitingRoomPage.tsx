@@ -110,7 +110,7 @@ export const WaitingRoomPage: React.FC<GameResponse> = (props) => {
           ) : (
             <div className="flex items-center gap-2.5 px-5 py-3 border border-[#c8952a]/20 rounded-xl text-xs text-[#c8b98a]/60 tracking-wide font-mono">
               <span className="w-2 h-2 rounded-full bg-[#c8952a] animate-pulse shrink-0" />
-              You're in — waiting for opponent
+              You're in - waiting for opponent
             </div>
           )}
         </div>

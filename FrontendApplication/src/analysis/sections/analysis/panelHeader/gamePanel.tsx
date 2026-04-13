@@ -30,11 +30,6 @@ export default function GamePanel() {
       columnGap={3}
       size={11}
     >
-      <Grid container justifyContent="center" alignItems="center" size="grow">
-        <Typography noWrap fontSize="0.9rem">
-          Site : {"King's Sacrifice"}
-        </Typography>
-      </Grid>
 
       <Grid container justifyContent="center" alignItems="center" size="grow">
         <Typography noWrap fontSize="0.9rem">

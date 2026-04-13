@@ -108,7 +108,7 @@ export const DashboardPage = () => {
             const movesCount = Math.floor(game.history.length / 2);
             const duration = game.finishedAt && game.createdAt
               ? formatDuration(new Date(game.finishedAt).getTime() - new Date(game.createdAt).getTime())
-              : "—";
+              : "-";
             const ratingDelta = isPlayerWhite ? game.whiteRatingDelta : game.blackRatingDelta;
 
             return (
@@ -197,7 +197,7 @@ export const DashboardPage = () => {
           const movesCount = Math.floor(game.history.length / 2);
           const duration = game.finishedAt && game.createdAt
             ? formatDuration(new Date(game.finishedAt).getTime() - new Date(game.createdAt).getTime())
-            : "—";
+            : "-";
           const ratingDelta = isPlayerWhite ? game.whiteRatingDelta : game.blackRatingDelta;
 
           return (

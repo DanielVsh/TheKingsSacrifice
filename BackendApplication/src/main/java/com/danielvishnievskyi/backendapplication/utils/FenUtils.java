@@ -99,7 +99,16 @@ public class FenUtils {
     return Optional.empty(); // if something’s inconsistent
   }
 
-  private static void validateFen(String fen) {
+  public static boolean isValidFen(String fen) {
+    try {
+      validateFen(fen);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  public static void validateFen(String fen) {
     if (fen == null || fen.isEmpty() || fen.split(" ").length != 6) {
       throw new IllegalArgumentException("Invalid FEN format.");
     }

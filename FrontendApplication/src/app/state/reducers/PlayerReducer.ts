@@ -1,4 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {PlayerTokens, RegisteredPlayerResponse} from "../../interfaces/IPlayer.ts";
 
 
 interface PlayerState {

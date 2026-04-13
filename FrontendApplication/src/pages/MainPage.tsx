@@ -9,7 +9,7 @@ const FEATURES = [
     icon: "♟",
     title: "Play Online",
     description:
-      "Challenge players from around the world in real-time. Choose your time control — bullet, blitz, or rapid — and jump into a match instantly.",
+      "Challenge players from around the world in real-time. Choose your time control - bullet, blitz, or rapid - and jump into a match instantly.",
     to: "/play/online",
     cta: "Find a game",
     accent: "blue",
@@ -27,7 +27,7 @@ const FEATURES = [
     icon: "♞",
     title: "Daily Puzzles",
     description:
-      "Solve tactical puzzles every day. From beginner forks to grandmaster-level combinations — train your pattern recognition.",
+      "Solve tactical puzzles every day. From beginner forks to grandmaster-level combinations - train your pattern recognition.",
     to: "/puzzle",
     cta: "Solve puzzles",
     accent: "amber",
@@ -90,7 +90,7 @@ export const MainPage: React.FC = () => {
         </h1>
 
         <p className="max-w-xl text-slate-400 text-lg leading-relaxed">
-          Play, learn, and master the game — all in one place. Whether you're a
+          Play, learn, and master the game - all in one place. Whether you're a
           beginner finding your first opening or a veteran chasing your peak rating,
           this is your board.
         </p>
@@ -141,7 +141,7 @@ export const MainPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── How it works ─────────────────────────────────────── */}
+
       <section className="max-w-2xl mx-auto">
         <p className="text-center text-[0.65rem] uppercase tracking-[0.2em] text-slate-600 font-mono mb-10">
           How it works
@@ -152,7 +152,7 @@ export const MainPage: React.FC = () => {
 
           <div className="space-y-8">
             {[
-              { step: "01", title: "Create your account",  desc: "Sign up in seconds. No credit card, no hassle — just pick a username and you're in.", icon: "♔" },
+              { step: "01", title: "Create your account",  desc: "Sign up in seconds. No credit card, no hassle - just pick a username and you're in.", icon: "♔" },
               { step: "02", title: "Choose your mode",     desc: "Play live online, challenge a bot, solve a puzzle, or analyse a past game. The choice is always yours.", icon: "♟" },
               { step: "03", title: "Play & improve",       desc: "Every game teaches you something. Use our analysis tool after each match to understand your mistakes and grow.", icon: "♜" },
               { step: "04", title: "Invite friends",       desc: "Share a link or a QR code and play a private game with anyone.", icon: "♞" },
@@ -202,7 +202,7 @@ export const MainPage: React.FC = () => {
             to="/play/online"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-bold tracking-wide transition-all hover:-translate-y-0.5 shadow-[0_4px_32px_rgba(99,102,241,0.4)] hover:shadow-[0_8px_40px_rgba(99,102,241,0.55)]"
           >
-            ♟ Play Now — it's free
+            ♟ Play Now - it's free
           </NavLink>
         </div>
       </section>

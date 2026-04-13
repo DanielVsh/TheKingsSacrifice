@@ -115,7 +115,103 @@ export const OnlinePage = () => {
           });
         }}
       />
+      {selectedGameMode !== GameMode.NON_RATING && (
+        <div className="w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10 border border-white/10">
 
+          {[
+            {
+              mode: GameMode.BULLET,
+              icon: "⚡",
+              title: "Bullet",
+              desc: "Lightning-fast games. Every second counts - it all comes down to instinct and reflexes.",
+              formats: ["1+0", "1+1", "2+1"],
+            },
+            {
+              mode: GameMode.BLITZ,
+              icon: "🔥",
+              title: "Blitz",
+              desc: "Quick games with time to think. A popular format for most players.",
+              formats: ["3+0", "3+2", "5+0", "5+3"],
+            },
+            {
+              mode: GameMode.RAPID,
+              icon: "⏱",
+              title: "Rapid",
+              desc: "Plenty of time for strategy. Ideal for a deeper analysis of positions during the game.",
+              formats: ["10+0", "10+5", "15+10", "25+10"],
+            },
+            {
+              mode: GameMode.CLASSICAL,
+              icon: "♟",
+              title: "Classical",
+              desc: "The longest format. Every move requires thorough preparation and long-term planning.",
+              formats: ["30+0", "30+20", "60+0", "90+30"],
+            },
+          ]
+            .filter((item) => item.mode === selectedGameMode)
+            .map((item) => (
+              <div
+                key={item.mode}
+                className="col-span-1 md:col-span-2 lg:col-span-3 grid grid-cols-1 lg:grid-cols-3 gap-px bg-white/10"
+              >
+
+                {/* Left: description */}
+                <div className="lg:col-span-2 bg-zinc-900 p-4 md:p-6 flex flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl md:text-3xl">{item.icon}</span>
+                    <h3 className="text-base md:text-lg font-bold uppercase tracking-widest text-white">
+                      {item.title}
+                    </h3>
+                  </div>
+
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    {item.desc}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {item.formats.map((f) => (
+                      <span
+                        key={f}
+                        className="px-3 py-1 border border-white/20 text-xs text-white/50 font-mono"
+                      >
+                  {f}
+                </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right: rating tip */}
+                <div className="bg-zinc-900 p-4 md:p-6 flex flex-col justify-between gap-4 border-t lg:border-t-0 lg:border-l border-white/10">
+                  <div>
+                    <p className="text-xs uppercase tracking-widest text-white/40 mb-2">
+                      Rating system
+                    </p>
+                    <p className="text-white/60 text-sm leading-relaxed">
+                      Every win, loss, or draw will affect your{" "}
+                      <span className="text-white font-semibold">ELO</span> rating for this format separately
+                    </p>
+                  </div>
+
+                  <div className="border-t border-white/10 pt-4">
+                    <p className="text-xs uppercase tracking-widest text-white/40 mb-1">
+                      Tip
+                    </p>
+                    <p className="text-white/50 text-xs leading-relaxed">
+                      {item.mode === GameMode.BULLET &&
+                        "Preset openings and quick patterns are the key to success."}
+                      {item.mode === GameMode.BLITZ &&
+                        "Practice tactical motifs - most games are decided by a mistake in the combination."}
+                      {item.mode === GameMode.RAPID &&
+                        "Take the time to study endgames - games are played to the very end here."}
+                      {item.mode === GameMode.CLASSICAL &&
+                        "Pre-opening preparations and a long-term strategy are crucial."}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
+      )}
       {selectedGameMode === GameMode.NON_RATING && (
         <>
           {/* Time Configuration Card */}

@@ -217,26 +217,26 @@ const SignupModal = ({ isOpen, onClose }: SignupModalProps) => {
                   disabled={!isValid}
                   className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-semibold text-sm tracking-wide transition-all hover:-translate-y-0.5 shadow-[0_4px_20px_rgba(59,130,246,0.3)] hover:shadow-[0_8px_28px_rgba(59,130,246,0.4)] flex items-center justify-center gap-2"
                 >
-                  "Create account"
+                  Create account
                 </button>
               </form>
 
               {/* Divider */}
-              <div className="flex items-center gap-3 my-5">
-                <div className="flex-1 h-px bg-slate-800" />
-                <span className="text-[0.65rem] uppercase tracking-widest text-slate-600 font-mono">or</span>
-                <div className="flex-1 h-px bg-slate-800" />
-              </div>
+              {/*<div className="flex items-center gap-3 my-5">*/}
+              {/*  <div className="flex-1 h-px bg-slate-800" />*/}
+              {/*  <span className="text-[0.65rem] uppercase tracking-widest text-slate-600 font-mono">or</span>*/}
+              {/*  <div className="flex-1 h-px bg-slate-800" />*/}
+              {/*</div>*/}
 
               {/* Social */}
-              <div className="space-y-2">
-                <button className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:border-slate-600 hover:bg-slate-800 text-slate-300 hover:text-white text-sm font-medium transition-all">
-                  <AiOutlineGoogle size={16} /> Continue with Google
-                </button>
-                <button className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:border-slate-600 hover:bg-slate-800 text-slate-300 hover:text-white text-sm font-medium transition-all">
-                  <AiOutlineApple size={16} /> Continue with Apple
-                </button>
-              </div>
+              {/*<div className="space-y-2">*/}
+              {/*  <button className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:border-slate-600 hover:bg-slate-800 text-slate-300 hover:text-white text-sm font-medium transition-all">*/}
+              {/*    <AiOutlineGoogle size={16} /> Continue with Google*/}
+              {/*  </button>*/}
+              {/*  <button className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:border-slate-600 hover:bg-slate-800 text-slate-300 hover:text-white text-sm font-medium transition-all">*/}
+              {/*    <AiOutlineApple size={16} /> Continue with Apple*/}
+              {/*  </button>*/}
+              {/*</div>*/}
             </div>
           </motion.div>
         </div>

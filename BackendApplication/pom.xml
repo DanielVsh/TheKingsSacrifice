@@ -144,7 +144,7 @@
 		<dependency>
 			<groupId>com.github.bhlangonijr</groupId>
 			<artifactId>chesslib</artifactId>
-            <version>1.3.4</version>
+			<version>1.3.6</version>
 		</dependency>
 
 	</dependencies>
@@ -154,7 +154,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.11.0</version>
+				<version>3.14.0</version>
 				<configuration>
 					<target>${java.version}</target>
 					<source>${java.version}</source>

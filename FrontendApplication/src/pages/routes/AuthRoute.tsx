@@ -46,7 +46,7 @@ export const AuthRoute = () => {
             Members only
           </h1>
           <p className="text-slate-400 text-sm leading-relaxed mb-8 max-w-xs">
-            You need an account to access this page. Log in or create one — it only takes a moment.
+            You need an account to access this page. Log in or create one - it only takes a moment.
           </p>
 
           {/* Auth buttons */}

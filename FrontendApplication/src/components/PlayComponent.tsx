@@ -402,8 +402,8 @@ const SidePanel: React.FC<{
           <span className="text-xs uppercase tracking-widest text-slate-500 font-mono">Chat</span>
         </div>
         <div className="flex-1 overflow-y-auto p-3 space-y-2 text-sm min-h-[80px]">
-          <ChatMessage name="Player1" text="Good luck!" />
-          <ChatMessage name="Player2" text="You too!" />
+          <ChatMessage name={`${props.whitePlayer?.nickname}`} text="Good luck!" />
+          <ChatMessage name={`${props.blackPlayer?.nickname}`} text="You too!" />
         </div>
         <div className="p-3 border-t border-slate-800">
           <input
@@ -414,7 +414,7 @@ const SidePanel: React.FC<{
         </div>
       </div>
 
-      {/* Actions — desktop only via showActions, mobile uses inline buttons */}
+      {/* Actions - desktop only via showActions, mobile uses inline buttons */}
       {showActions && (
         <div className="flex gap-2">
           <button
